@@ -11,9 +11,7 @@ global.ResizeObserver = class {
 
 describe("DisplayModeToggle", () => {
   it("renders both Text and Cards buttons with h-11 (44px) touch target", () => {
-    render(
-      <DisplayModeToggle mode="text" onChange={() => {}} />
-    );
+    render(<DisplayModeToggle mode="text" onChange={() => {}} />);
 
     const textButton = screen.getByRole("button", { name: /text/i });
     const cardsButton = screen.getByRole("button", { name: /cards/i });

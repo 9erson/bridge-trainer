@@ -32,5 +32,27 @@ describe("CardDisplay", () => {
         expect(card.className).not.toContain("bg-white");
       });
     });
+
+    it("scopes hover effects to hover-capable devices via mini-card class", () => {
+      const { container } = render(
+        <CardDisplay hand={graphicHand} mode="graphic" />
+      );
+
+      const miniCards = container.querySelectorAll(
+        ".rounded-md.border-border\\/60"
+      );
+
+      expect(miniCards.length).toBeGreaterThan(0);
+
+      Array.from(miniCards).forEach(card => {
+        // Bare hover: classes stick on touch devices after tap.
+        // Instead, the mini-card CSS class scopes hover effects
+        // behind @media (hover: hover) so they only activate on
+        // pointer devices.
+        expect(card.className).not.toContain("hover:shadow-md");
+        expect(card.className).not.toContain("hover:-translate-y-0.5");
+        expect(card.classList.contains("mini-card")).toBe(true);
+      });
+    });
   });
 });

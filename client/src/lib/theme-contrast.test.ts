@@ -32,6 +32,6 @@ describe("Theme contrast: --muted-foreground", () => {
     (token, bg) => {
       const ratio = wcagContrast(MUTED_FG, bg);
       expect(ratio).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_MIN);
-    },
+    }
   );
 });

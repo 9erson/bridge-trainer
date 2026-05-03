@@ -27,12 +27,16 @@ describe("Switch", () => {
     //   py-[13px] → 18 + 26 = 44px height
     //   px-1.5   → 32 + 12 = 44px width
     const hasPadding =
-      classes.includes("py-") || classes.includes("p-") || classes.includes("p[");
+      classes.includes("py-") ||
+      classes.includes("p-") ||
+      classes.includes("p[");
     expect(hasPadding).toBe(true);
 
     // Verify negative margin to prevent layout shift
     const hasNegativeMargin =
-      classes.includes("-m") || classes.includes("-my") || classes.includes("-mx");
+      classes.includes("-m") ||
+      classes.includes("-my") ||
+      classes.includes("-mx");
     expect(hasNegativeMargin).toBe(true);
   });
 

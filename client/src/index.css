@@ -149,4 +149,14 @@
     font-family: "JetBrains Mono", monospace;
     font-variant-numeric: tabular-nums;
   }
+
+  @media (hover: hover) {
+    .mini-card:hover {
+      box-shadow:
+        0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
+        0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+      --tw-translate-y: calc(var(--spacing) * -0.5);
+      translate: var(--tw-translate-x) var(--tw-translate-y);
+    }
+  }
 }
