@@ -120,7 +120,7 @@ export default function OpeningBidResults({
                             {userFormatted.text}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1 text-emerald-600 text-sm">
+                        <div className="flex items-center gap-1 text-primary text-sm">
                           <Check className="w-3.5 h-3.5" />
                           <span style={{ color: correctFormatted.color }}>
                             {correctFormatted.text}

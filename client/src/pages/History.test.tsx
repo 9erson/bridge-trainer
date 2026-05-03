@@ -173,3 +173,14 @@ describe("History", () => {
     });
   });
 });
+
+describe("History — theme tokens (#32)", () => {
+  it("Incomplete badge uses accent theme tokens, not hard-coded amber", () => {
+    // The Incomplete badge should use bg-accent text-accent-foreground
+    // instead of bg-amber-100 text-amber-700
+    expect(historySource).not.toContain("bg-amber-100");
+    expect(historySource).not.toContain("text-amber-700");
+    expect(historySource).toContain("bg-accent");
+    expect(historySource).toContain("text-accent-foreground");
+  });
+});

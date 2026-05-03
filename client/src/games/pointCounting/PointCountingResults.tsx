@@ -118,7 +118,7 @@ export default function PointCountingResults({
                       <X className="w-3.5 h-3.5" />
                       You: {m.userAnswer === "-1" ? "Time's up" : m.userAnswer}
                     </div>
-                    <div className="flex items-center gap-1 text-emerald-600 text-sm">
+                    <div className="flex items-center gap-1 text-primary text-sm">
                       <Check className="w-3.5 h-3.5" />
                       Answer: {m.correctAnswer}
                     </div>

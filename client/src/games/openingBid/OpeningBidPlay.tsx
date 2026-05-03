@@ -498,8 +498,8 @@ export default function OpeningBidPlay({
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
                     ${
                       feedback.isCorrect
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : "bg-red-50 text-red-700 border border-red-200"
+                        ? "bg-primary/10 text-primary border border-primary/30"
+                        : "bg-destructive/10 text-destructive border border-destructive/30"
                     }`}
                 >
                   {feedback.isCorrect ? (

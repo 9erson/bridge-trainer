@@ -1,5 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { render, screen } from "@testing-library/react";
+
+// Read source file for static class analysis (matches History.test.tsx pattern)
+const source = readFileSync(
+  resolve(import.meta.dirname, "PointCountingPlay.tsx"),
+  "utf-8"
+);
 
 // Mock framer-motion to avoid animation complexity in tests
 vi.mock("framer-motion", () => ({
@@ -72,5 +80,25 @@ describe("PointCountingPlay", () => {
       hasAssociatedLabel;
 
     expect(hasAccessibleName).toBe(true);
+  });
+});
+
+describe("PointCountingPlay — feedback badge theme tokens (#32)", () => {
+  it("correct feedback badge uses primary theme tokens, not hard-coded emerald", () => {
+    expect(source).not.toContain("bg-emerald-50");
+    expect(source).not.toContain("text-emerald-700");
+    expect(source).not.toContain("border-emerald-200");
+    expect(source).toContain("bg-primary/10");
+    expect(source).toContain("text-primary");
+    expect(source).toContain("border-primary/30");
+  });
+
+  it("incorrect feedback badge uses destructive theme tokens, not hard-coded red", () => {
+    expect(source).not.toContain("bg-red-50");
+    expect(source).not.toContain("text-red-700");
+    expect(source).not.toContain("border-red-200");
+    expect(source).toContain("bg-destructive/10");
+    expect(source).toContain("text-destructive");
+    expect(source).toContain("border-destructive/30");
   });
 });

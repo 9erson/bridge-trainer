@@ -249,7 +249,7 @@ function SessionRow({
             {GAME_NAMES[session.gameType] ?? session.gameType}
           </span>
           {!session.isComplete && (
-            <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
+            <span className="text-xs bg-accent text-accent-foreground px-1.5 py-0.5 rounded">
               Incomplete
             </span>
           )}

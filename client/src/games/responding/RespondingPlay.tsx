@@ -377,7 +377,7 @@ export default function RespondingPlay({
         <CardContent className="pt-6 pb-6">
           {/* Partner's bid callout */}
           <div className="flex justify-center mb-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-emerald-600/30 bg-emerald-50/50">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-primary/30 bg-primary/5">
               <span className="text-sm text-muted-foreground">
                 Partner opened:
               </span>

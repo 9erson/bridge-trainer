@@ -126,7 +126,7 @@ export default function RespondingResults({
                   className={`p-3 rounded-lg space-y-2 ${
                     h.isCorrect
                       ? "bg-muted/30"
-                      : "bg-red-50/50 border border-red-200/50"
+                      : "bg-destructive/5 border border-destructive/20"
                   }`}
                 >
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
@@ -148,7 +148,7 @@ export default function RespondingResults({
                           {userFormatted.text}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 text-emerald-600 text-sm">
+                      <div className="flex items-center gap-1 text-primary text-sm">
                         <Check className="w-3.5 h-3.5" />
                         <span style={{ color: correctFormatted.color }}>
                           {correctFormatted.text}

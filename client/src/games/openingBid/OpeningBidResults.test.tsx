@@ -1,7 +1,15 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { render, fireEvent } from "@testing-library/react";
 import OpeningBidResults from "./OpeningBidResults";
 import type { GameResults } from "@/lib/gameRegistry";
+
+// Read source file for static class analysis (matches History.test.tsx pattern)
+const source = readFileSync(
+  resolve(import.meta.dirname, "OpeningBidResults.tsx"),
+  "utf-8"
+);
 
 function makeResults(overrides?: Partial<GameResults>): GameResults {
   return {
@@ -84,5 +92,12 @@ describe("OpeningBidResults", () => {
     expect(toggleButton!.className).toContain("focus-visible:ring-2");
     expect(toggleButton!.className).toContain("focus-visible:ring-ring");
     expect(toggleButton!.className).toContain("focus-visible:ring-offset-2");
+  });
+});
+
+describe("OpeningBidResults — theme tokens (#32)", () => {
+  it("correct answer display uses text-primary, not hard-coded text-emerald-600", () => {
+    expect(source).not.toContain("text-emerald-600");
+    expect(source).toContain("text-primary");
   });
 });
