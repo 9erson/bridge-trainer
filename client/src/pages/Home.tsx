@@ -53,9 +53,19 @@ export default function Home() {
               transition={{ delay: i * 0.1 }}
             >
               <Card
+                role="button"
+                tabIndex={0}
+                aria-label={`Play ${game.config.name}`}
                 className="border-border/50 shadow-sm hover:shadow-md hover:border-primary/30
-                           transition-all duration-200 cursor-pointer group"
+                           transition-all duration-200 cursor-pointer group
+                           outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 onClick={() => navigate(`/game/${game.config.id}`)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    navigate(`/game/${game.config.id}`);
+                  }
+                }}
               >
                 <CardContent className="p-5 flex items-start gap-4">
                   <img

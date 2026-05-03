@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 // Register games via side-effect imports
 import "@/games/pointCounting/index";
@@ -23,14 +23,18 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
+// Shared mock navigate so tests can assert calls
+const mockNavigate = vi.fn();
+
 // Mock wouter's useLocation for Home page
 vi.mock("wouter", () => ({
-  useLocation: () => ["/", vi.fn()],
+  useLocation: () => ["/", mockNavigate],
 }));
 
 describe("Home page", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    mockNavigate.mockClear();
   });
 
   it("renders a card for each registered game", async () => {
@@ -68,6 +72,64 @@ describe("Home page", () => {
     expect(iconImgs.length).toBeGreaterThan(0);
     for (const img of iconImgs) {
       expect(img.getAttribute("loading")).toBe("lazy");
+    }
+  });
+
+  it("game cards are keyboard-focusable with role=button", async () => {
+    const { default: Home } = await import("@/pages/Home");
+    const { container } = render(<Home />);
+
+    const cards = Array.from(container.querySelectorAll('[data-slot="card"]'));
+    expect(cards.length).toBeGreaterThan(0);
+
+    for (const card of cards) {
+      expect(card.getAttribute("role")).toBe("button");
+      expect(card.getAttribute("tabindex")).toBe("0");
+    }
+  });
+
+  it("game cards navigate on Enter and Space key press", async () => {
+    const { default: Home } = await import("@/pages/Home");
+    const { container } = render(<Home />);
+
+    const cards = container.querySelectorAll('[data-slot="card"]');
+    const firstCard = cards[0] as HTMLElement;
+
+    // Enter key activates navigation
+    fireEvent.keyDown(firstCard, { key: "Enter" });
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+
+    mockNavigate.mockClear();
+
+    // Space key activates navigation
+    fireEvent.keyDown(firstCard, { key: " " });
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+  });
+
+  it("game cards have descriptive aria-labels for screen readers", async () => {
+    const { default: Home } = await import("@/pages/Home");
+    const { container } = render(<Home />);
+
+    const cards = Array.from(container.querySelectorAll('[data-slot="card"]'));
+    expect(cards.length).toBeGreaterThan(0);
+
+    for (const card of cards) {
+      const label = card.getAttribute("aria-label");
+      expect(label).toContain("Play");
+    }
+  });
+
+  it("game cards have focus-visible ring styles for keyboard users", async () => {
+    const { default: Home } = await import("@/pages/Home");
+    const { container } = render(<Home />);
+
+    const cards = Array.from(container.querySelectorAll('[data-slot="card"]'));
+    expect(cards.length).toBeGreaterThan(0);
+
+    for (const card of cards) {
+      expect(card.className).toContain("focus-visible:ring-2");
+      expect(card.className).toContain("focus-visible:ring-ring");
+      expect(card.className).toContain("focus-visible:ring-offset-2");
     }
   });
 
