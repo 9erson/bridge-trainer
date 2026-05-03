@@ -15,10 +15,13 @@ import {
 } from "@/components/ui/select";
 import {
   getAllSessions,
-  getCompletedSessionStats,
   deleteSession,
   type GameSession,
 } from "@/lib/db";
+import {
+  computeSessionStats,
+  computeAggregatedStats,
+} from "@/lib/stats";
 import {
   LineChart,
   Line,
@@ -52,35 +55,11 @@ export default function History() {
     setSessions(allSessions);
 
     if (filter !== "all") {
-      const s = await getCompletedSessionStats(filter);
-      setStats(s);
+      const filtered = allSessions.filter(s => s.gameType === filter);
+      setStats(computeSessionStats(filtered));
     } else {
-      // Aggregate stats across all game types
       const gameTypes = Array.from(new Set(allSessions.map(s => s.gameType)));
-      let totalSessions = 0;
-      let totalAccuracy = 0;
-      let totalTime = 0;
-      let bestAccuracy = 0;
-      const allTrend: { date: string; accuracy: number }[] = [];
-
-      for (const gt of gameTypes) {
-        const s = await getCompletedSessionStats(gt);
-        totalSessions += s.totalSessions;
-        totalAccuracy += s.avgAccuracy * s.totalSessions;
-        totalTime += s.avgTime * s.totalSessions;
-        bestAccuracy = Math.max(bestAccuracy, s.bestAccuracy);
-        allTrend.push(...s.recentTrend);
-      }
-
-      setStats({
-        totalSessions,
-        avgAccuracy: totalSessions > 0 ? totalAccuracy / totalSessions : 0,
-        avgTime: totalSessions > 0 ? totalTime / totalSessions : 0,
-        bestAccuracy,
-        recentTrend: allTrend
-          .sort((a, b) => a.date.localeCompare(b.date))
-          .slice(-20),
-      });
+      setStats(computeAggregatedStats(allSessions, gameTypes));
     }
   };
 

@@ -21,16 +21,10 @@ const mockSession = {
   extraData: "{}",
 };
 
+const mockGetAllSessions = vi.fn(() => Promise.resolve([mockSession]));
+
 vi.mock("@/lib/db", () => ({
-  getAllSessions: () => Promise.resolve([mockSession]),
-  getCompletedSessionStats: () =>
-    Promise.resolve({
-      totalSessions: 1,
-      avgAccuracy: 0.8,
-      avgTime: 5000,
-      bestAccuracy: 0.8,
-      recentTrend: [],
-    }),
+  getAllSessions: () => mockGetAllSessions(),
   deleteSession: () => Promise.resolve(),
 }));
 
@@ -182,5 +176,26 @@ describe("History — theme tokens (#32)", () => {
     expect(historySource).not.toContain("text-amber-700");
     expect(historySource).toContain("bg-accent");
     expect(historySource).toContain("text-accent-foreground");
+  });
+});
+
+describe("History — query optimization (#39)", () => {
+  it("calls getAllSessions exactly once on mount (no N+1 queries)", async () => {
+    mockGetAllSessions.mockClear();
+    const { default: History } = await import("@/pages/History");
+    render(
+      <Switch>
+        <Route>{() => <History />}</Route>
+      </Switch>
+    );
+
+    await screen.findByText("Point Counting");
+
+    expect(mockGetAllSessions).toHaveBeenCalledTimes(1);
+  });
+
+  it("no longer imports getCompletedSessionStats from db", () => {
+    // After optimization, History.tsx should not import getCompletedSessionStats
+    expect(historySource).not.toContain("getCompletedSessionStats");
   });
 });
