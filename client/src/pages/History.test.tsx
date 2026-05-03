@@ -113,6 +113,39 @@ describe("History", () => {
     expect(deleteButton!.getAttribute("aria-label")).toBe("Delete session");
   });
 
+  it("delete session button has h-11 and w-11 (44×44px) to meet WCAG touch target minimum", async () => {
+    const { default: History } = await import("@/pages/History");
+    render(
+      <Switch>
+        <Route>{() => <History />}</Route>
+      </Switch>
+    );
+
+    // Wait for async data loading to complete
+    await screen.findByText("Point Counting");
+
+    // Find the delete button by its aria-label
+    const deleteButtons = document.querySelectorAll<HTMLButtonElement>(
+      'button[data-slot="button"]'
+    );
+    const deleteButton = Array.from(deleteButtons).find(
+      b => b.getAttribute("aria-label") === "Delete session"
+    );
+    expect(deleteButton).toBeDefined();
+
+    // WCAG 2.5.8: touch targets must be at least 44x44px
+    // h-11 = 2.75rem = 44px, w-11 = 2.75rem = 44px
+    const classes = deleteButton!.className;
+    expect(
+      classes.includes("h-11"),
+      `Delete button is missing h-11 class (got: "${classes}")`
+    ).toBe(true);
+    expect(
+      classes.includes("w-11"),
+      `Delete button is missing w-11 class (got: "${classes}")`
+    ).toBe(true);
+  });
+
   it("StatCard decorative icons have aria-hidden=true", async () => {
     const { default: History } = await import("@/pages/History");
     render(

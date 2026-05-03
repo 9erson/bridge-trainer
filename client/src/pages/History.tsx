@@ -272,8 +272,7 @@ function SessionRow({
       </div>
       <Button
         variant="ghost"
-        size="sm"
-        className="text-muted-foreground hover:text-destructive shrink-0"
+        className="text-muted-foreground hover:text-destructive shrink-0 h-11 w-11 p-0 flex items-center justify-center"
         aria-label="Delete session"
         onClick={() => onDelete(session.id)}
       >
