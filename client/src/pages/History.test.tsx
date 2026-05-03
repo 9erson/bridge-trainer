@@ -200,6 +200,76 @@ describe("History — query optimization (#39)", () => {
   });
 });
 
+describe("History — mobile responsive layout (#29)", () => {
+  it("SessionRow uses responsive flex direction (column on mobile, row on desktop)", () => {
+    // The session row container should use flex-col on mobile and flex-row at md+
+    const sessionRowSection = historySource.substring(
+      historySource.indexOf("const SessionRow = memo")
+    );
+
+    // Must have flex-col (mobile default) and md:flex-row (desktop)
+    expect(
+      sessionRowSection,
+      "SessionRow root should have flex-col for mobile stacking"
+    ).toContain("flex-col");
+    expect(
+      sessionRowSection,
+      "SessionRow root should have md:flex-row for desktop horizontal layout"
+    ).toContain("md:flex-row");
+  });
+
+  it("SessionRow stat blocks do not use shrink-0 on mobile (allows wrapping)", () => {
+    const sessionRowSection = historySource.substring(
+      historySource.indexOf("const SessionRow = memo")
+    );
+
+    // The score and avg-time divs should not have unconditional shrink-0.
+    // They should use md:shrink-0 so they can flex on mobile.
+    // Match "shrink-0" that is NOT preceded by "md:" (i.e. unconditional)
+    const unconditionalShrink = sessionRowSection.match(
+      /(?<!md:)shrink-0/g
+    );
+    // Only the delete Button should have unconditional shrink-0 (it's always 44px)
+    // Filter to only <div> elements with unconditional shrink-0
+    const divsWithUnconditionalShrink =
+      sessionRowSection.match(/<div[^>]*className="[^"]*(?<!md:)shrink-0[^"]*"/g);
+    expect(
+      divsWithUnconditionalShrink,
+      "No <div> in SessionRow should have unconditional shrink-0"
+    ).toBeNull();
+  });
+
+  it("SessionRow score and time stats are grouped in a single row at mobile", () => {
+    const sessionRowSection = historySource.substring(
+      historySource.indexOf("const SessionRow = memo")
+    );
+
+    // Score and time should be in a flex container that lays them out side-by-side
+    // This means there should be a flex wrapper around the stat divs
+    expect(sessionRowSection).toContain("flex");
+    expect(sessionRowSection).toContain("gap-");
+  });
+
+  it("SessionRow delete button retains h-11 w-11 for 44×44px WCAG touch target", () => {
+    const sessionRowSection = historySource.substring(
+      historySource.indexOf("const SessionRow = memo")
+    );
+
+    // The delete button must keep its 44×44px touch target
+    expect(sessionRowSection).toContain("h-11");
+    expect(sessionRowSection).toContain("w-11");
+  });
+
+  it("SessionRow outer container keeps md:items-center for desktop alignment", () => {
+    const sessionRowSection = historySource.substring(
+      historySource.indexOf("const SessionRow = memo")
+    );
+
+    // On desktop (md+), items should be vertically centered like before
+    expect(sessionRowSection).toContain("md:items-center");
+  });
+});
+
 describe("History — React.memo optimization (#18)", () => {
   it("StatCard and SessionRow use stable icon references (module-level constants)", () => {
     // Verify that the icon constants are extracted to module level

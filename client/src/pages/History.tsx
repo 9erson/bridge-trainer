@@ -221,7 +221,7 @@ const SessionRow = memo(function SessionRow({
   const pct = Math.round(session.accuracy * 100);
 
   return (
-    <div className="flex items-center gap-4 p-3 rounded-lg border border-border/50 bg-card hover:bg-muted/30 transition-colors">
+    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 p-3 rounded-lg border border-border/50 bg-card hover:bg-muted/30 transition-colors">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-medium text-sm">
@@ -238,25 +238,27 @@ const SessionRow = memo(function SessionRow({
           {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </p>
       </div>
-      <div className="text-right shrink-0">
-        <p className="font-mono text-sm font-semibold">
-          {session.correctCount}/{session.totalHands}
-        </p>
-        <p className="text-xs text-muted-foreground">{pct}%</p>
+      <div className="flex items-center gap-4">
+        <div className="text-right md:shrink-0">
+          <p className="font-mono text-sm font-semibold">
+            {session.correctCount}/{session.totalHands}
+          </p>
+          <p className="text-xs text-muted-foreground">{pct}%</p>
+        </div>
+        <div className="text-right md:shrink-0">
+          <p className="font-mono text-xs text-muted-foreground">
+            {(session.averageTime / 1000).toFixed(1)}s avg
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          className="text-muted-foreground hover:text-destructive shrink-0 h-11 w-11 p-0 flex items-center justify-center"
+          aria-label="Delete session"
+          onClick={() => onDelete(session.id)}
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </Button>
       </div>
-      <div className="text-right shrink-0">
-        <p className="font-mono text-xs text-muted-foreground">
-          {(session.averageTime / 1000).toFixed(1)}s avg
-        </p>
-      </div>
-      <Button
-        variant="ghost"
-        className="text-muted-foreground hover:text-destructive shrink-0 h-11 w-11 p-0 flex items-center justify-center"
-        aria-label="Delete session"
-        onClick={() => onDelete(session.id)}
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-      </Button>
     </div>
   );
 });
