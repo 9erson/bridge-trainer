@@ -172,8 +172,8 @@ export default function ConventionReference() {
           <BookOpen className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-bold font-heading">Convention Quick Reference</h1>
-          <p className="text-sm text-muted-foreground font-body">
+          <h1 className="text-xl font-bold font-sans">Convention Quick Reference</h1>
+          <p className="text-sm text-muted-foreground font-serif">
             Concise cheat-sheets for opening bids and key conventions.
           </p>
         </div>
@@ -208,8 +208,8 @@ function ConventionCard({ convention }: { convention: ConventionRef }) {
       {/* Title & tagline */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-heading">{convention.name}</CardTitle>
-          <p className="text-sm text-muted-foreground font-body">{convention.tagline}</p>
+          <CardTitle className="text-lg font-sans">{convention.name}</CardTitle>
+          <p className="text-sm text-muted-foreground font-serif">{convention.tagline}</p>
         </CardHeader>
         <CardContent className="pt-0">
           <a
@@ -227,7 +227,7 @@ function ConventionCard({ convention }: { convention: ConventionRef }) {
       {/* Opening Bids Table */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-heading">Opening Bids</CardTitle>
+          <CardTitle className="text-base font-sans">Opening Bids</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="overflow-x-auto">
@@ -256,7 +256,7 @@ function ConventionCard({ convention }: { convention: ConventionRef }) {
       {/* Key Rules */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-heading">Key Rules</CardTitle>
+          <CardTitle className="text-base font-sans">Key Rules</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <ul className="space-y-1.5">
@@ -273,7 +273,7 @@ function ConventionCard({ convention }: { convention: ConventionRef }) {
       {/* Key Conventions */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-heading">Key Conventions</CardTitle>
+          <CardTitle className="text-base font-sans">Key Conventions</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="space-y-2">
@@ -291,7 +291,7 @@ function ConventionCard({ convention }: { convention: ConventionRef }) {
       {convention.differences && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-heading">
+            <CardTitle className="text-base font-sans">
               {convention.id === 'precision' ? 'vs. SAYC / 2/1' : 'vs. SAYC'}
             </CardTitle>
           </CardHeader>
