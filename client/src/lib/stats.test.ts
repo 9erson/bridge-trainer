@@ -63,7 +63,9 @@ describe("computeSessionStats", () => {
     const sessions = Array.from({ length: 30 }, (_, i) =>
       makeSession({
         id: `s${i}`,
-        startedAt: new Date(`2025-01-${String(i + 1).padStart(2, "0")}T10:00:00Z`).getTime(),
+        startedAt: new Date(
+          `2025-01-${String(i + 1).padStart(2, "0")}T10:00:00Z`
+        ).getTime(),
         accuracy: 0.5 + i * 0.01,
       })
     );
@@ -110,8 +112,18 @@ describe("computeAggregatedStats", () => {
 
   it("matches computeSessionStats for a single game type", () => {
     const sessions = [
-      makeSession({ id: "s1", gameType: "point-counting", accuracy: 0.7, averageTime: 4000 }),
-      makeSession({ id: "s2", gameType: "point-counting", accuracy: 0.9, averageTime: 6000 }),
+      makeSession({
+        id: "s1",
+        gameType: "point-counting",
+        accuracy: 0.7,
+        averageTime: 4000,
+      }),
+      makeSession({
+        id: "s2",
+        gameType: "point-counting",
+        accuracy: 0.9,
+        averageTime: 6000,
+      }),
     ];
 
     const aggregated = computeAggregatedStats(sessions, ["point-counting"]);
@@ -126,10 +138,25 @@ describe("computeAggregatedStats", () => {
   it("merges multiple game types with weighted averages", () => {
     const sessions = [
       // 2 point-counting sessions: avg accuracy 0.75, avg time 4000
-      makeSession({ id: "pc1", gameType: "point-counting", accuracy: 0.7, averageTime: 3000 }),
-      makeSession({ id: "pc2", gameType: "point-counting", accuracy: 0.8, averageTime: 5000 }),
+      makeSession({
+        id: "pc1",
+        gameType: "point-counting",
+        accuracy: 0.7,
+        averageTime: 3000,
+      }),
+      makeSession({
+        id: "pc2",
+        gameType: "point-counting",
+        accuracy: 0.8,
+        averageTime: 5000,
+      }),
       // 1 opening-bid session: accuracy 1.0, time 6000
-      makeSession({ id: "ob1", gameType: "opening-bid", accuracy: 1.0, averageTime: 6000 }),
+      makeSession({
+        id: "ob1",
+        gameType: "opening-bid",
+        accuracy: 1.0,
+        averageTime: 6000,
+      }),
     ];
 
     const result = computeAggregatedStats(sessions, [
@@ -150,7 +177,9 @@ describe("computeAggregatedStats", () => {
       makeSession({
         id: `pc${i}`,
         gameType: "point-counting",
-        startedAt: new Date(`2025-01-${String(i + 1).padStart(2, "0")}T10:00:00Z`).getTime(),
+        startedAt: new Date(
+          `2025-01-${String(i + 1).padStart(2, "0")}T10:00:00Z`
+        ).getTime(),
         accuracy: 0.5,
       })
     ).concat(
@@ -158,7 +187,9 @@ describe("computeAggregatedStats", () => {
         makeSession({
           id: `ob${i}`,
           gameType: "opening-bid",
-          startedAt: new Date(`2025-02-${String(i + 1).padStart(2, "0")}T10:00:00Z`).getTime(),
+          startedAt: new Date(
+            `2025-02-${String(i + 1).padStart(2, "0")}T10:00:00Z`
+          ).getTime(),
           accuracy: 0.6,
         })
       )

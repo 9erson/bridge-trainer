@@ -8,9 +8,7 @@ export interface SessionStats {
   recentTrend: { date: string; accuracy: number }[];
 }
 
-export function computeSessionStats(
-  sessions: GameSession[]
-): SessionStats {
+export function computeSessionStats(sessions: GameSession[]): SessionStats {
   const completed = sessions.filter(s => s.isComplete);
 
   if (completed.length === 0) {

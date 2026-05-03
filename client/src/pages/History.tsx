@@ -13,15 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  getAllSessions,
-  deleteSession,
-  type GameSession,
-} from "@/lib/db";
-import {
-  computeSessionStats,
-  computeAggregatedStats,
-} from "@/lib/stats";
+import { getAllSessions, deleteSession, type GameSession } from "@/lib/db";
+import { computeSessionStats, computeAggregatedStats } from "@/lib/stats";
 import {
   LineChart,
   Line,
