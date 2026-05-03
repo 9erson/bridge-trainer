@@ -65,6 +65,35 @@ describe("Layout", () => {
     expect(screen.getByText("Test content")).toBeDefined();
   });
 
+  it("hamburger button has touch target of at least 44x44px", async () => {
+    const { default: Layout } = await import("@/components/Layout");
+    render(
+      <TestWrapper>
+        <Layout>Test content</Layout>
+      </TestWrapper>
+    );
+
+    // The mobile hamburger is the only <button> in the mobile header
+    const hamburger = document.querySelector<HTMLButtonElement>(
+      '[data-slot="button"]'
+    );
+    expect(hamburger).not.toBeNull();
+
+    // jsdom doesn't resolve Tailwind classes to pixel values,
+    // so verify the min-size utility classes are present on the element.
+    // min-h-[44px] and min-w-[44px] ensure WCAG 2.5.8 compliance.
+    const classList = Array.from(hamburger!.classList);
+    const hasMinHeight44 = classList.some(
+      (c) => c === "min-h-[44px]" || c === "min-h-11"
+    );
+    const hasMinWidth44 = classList.some(
+      (c) => c === "min-w-[44px]" || c === "min-w-11"
+    );
+
+    expect(hasMinHeight44).toBe(true);
+    expect(hasMinWidth44).toBe(true);
+  });
+
   it("does not call getAllGames on every render", async () => {
     const spy = vi.spyOn(gameRegistry, "getAllGames");
 

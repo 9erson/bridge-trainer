@@ -86,7 +86,7 @@ export default function Layout({ children }: LayoutProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-sidebar-foreground hover:bg-sidebar-accent"
+            className="text-sidebar-foreground hover:bg-sidebar-accent min-h-[44px] min-w-[44px]"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
