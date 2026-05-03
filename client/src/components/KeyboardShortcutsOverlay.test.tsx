@@ -31,4 +31,16 @@ describe("KeyboardShortcutsOverlay", () => {
       "Close keyboard shortcuts"
     );
   });
+
+  it("close button has focus-visible ring for keyboard accessibility", async () => {
+    const { default: KeyboardShortcutsOverlay } = await import(
+      "@/components/KeyboardShortcutsOverlay"
+    );
+    render(<KeyboardShortcutsOverlay isOpen={true} onClose={() => {}} />);
+
+    const closeButton = screen.getByLabelText("Close keyboard shortcuts");
+    expect(closeButton.className).toContain("focus-visible:ring-2");
+    expect(closeButton.className).toContain("focus-visible:ring-ring");
+    expect(closeButton.className).toContain("focus-visible:ring-offset-2");
+  });
 });

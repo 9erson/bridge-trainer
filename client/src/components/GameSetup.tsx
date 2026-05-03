@@ -136,7 +136,7 @@ export default function GameSetup({
         {/* Advanced settings toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <Settings2 className="w-3.5 h-3.5" />
           {showAdvanced ? "Hide" : "Show"} advanced settings

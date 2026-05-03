@@ -44,7 +44,8 @@ class ErrorBoundary extends Component<Props, State> {
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-lg",
                 "bg-primary text-primary-foreground",
-                "hover:opacity-90 cursor-pointer"
+                "hover:opacity-90 cursor-pointer",
+                "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               )}
             >
               <RotateCcw size={16} />

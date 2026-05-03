@@ -116,7 +116,7 @@ export default function KeyboardShortcutsOverlay({
               <button
                 onClick={onClose}
                 aria-label="Close keyboard shortcuts"
-                className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <X className="w-4 h-4" />
               </button>

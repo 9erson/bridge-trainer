@@ -91,7 +91,7 @@ export default function PointCountingResults({
           <CardHeader className="pb-2">
             <button
               onClick={() => setShowMistakes(!showMistakes)}
-              className="flex items-center justify-between w-full"
+              className="flex items-center justify-between w-full rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <CardTitle className="text-base">
                 Review Mistakes ({mistakes.length})

@@ -65,4 +65,24 @@ describe("OpeningBidResults", () => {
     expect(styleAttr).toContain("var(--muted-foreground)");
     expect(styleAttr).not.toContain("#888");
   });
+
+  it("Review Mistakes toggle has focus-visible ring for keyboard accessibility", () => {
+    const results = makeResults();
+    const { container } = render(
+      <OpeningBidResults
+        results={results}
+        onPlayAgain={() => {}}
+        onBackToMenu={() => {}}
+      />
+    );
+
+    const toggleButton = Array.from(container.querySelectorAll("button")).find(
+      btn => btn.textContent?.includes("Review Mistakes")
+    );
+
+    expect(toggleButton).toBeTruthy();
+    expect(toggleButton!.className).toContain("focus-visible:ring-2");
+    expect(toggleButton!.className).toContain("focus-visible:ring-ring");
+    expect(toggleButton!.className).toContain("focus-visible:ring-offset-2");
+  });
 });
