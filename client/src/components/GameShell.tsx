@@ -57,6 +57,8 @@ export default function GameShell({
           <Progress
             value={(currentHand / totalHands) * 100}
             className="w-32 h-1.5"
+            aria-label="Practice session progress"
+            getValueLabel={() => `Hand ${currentHand} of ${totalHands}`}
           />
         </div>
         <Button
