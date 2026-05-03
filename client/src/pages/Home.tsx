@@ -25,6 +25,8 @@ export default function Home() {
         <img
           src={HERO_IMAGE}
           alt="Bridge card table"
+          width="1200"
+          height="300"
           className="w-full h-40 sm:h-52 object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
@@ -59,6 +61,7 @@ export default function Home() {
                   <img
                     src={game.config.icon}
                     alt={game.config.name}
+                    loading="lazy"
                     className="w-14 h-14 rounded-lg object-cover shrink-0"
                   />
                   <div className="flex-1 min-w-0">

@@ -42,6 +42,35 @@ describe("Home page", () => {
     expect(screen.getByText("Responding")).toBeDefined();
   });
 
+  it("renders the hero image with explicit width and height to prevent CLS", async () => {
+    const { default: Home } = await import("@/pages/Home");
+    const { container } = render(<Home />);
+
+    const heroImg = container.querySelector(
+      'img[alt="Bridge card table"]'
+    ) as HTMLImageElement;
+    expect(heroImg).not.toBeNull();
+    expect(heroImg.hasAttribute("width")).toBe(true);
+    expect(heroImg.hasAttribute("height")).toBe(true);
+  });
+
+  it("lazy-loads game card icon images", async () => {
+    const { default: Home } = await import("@/pages/Home");
+    const { container } = render(<Home />);
+
+    // Game icons are images inside CardContent that are NOT the hero
+    const heroImg = container.querySelector(
+      'img[alt="Bridge card table"]'
+    ) as HTMLImageElement;
+    const allImgs = Array.from(container.querySelectorAll("img"));
+    const iconImgs = allImgs.filter(img => img !== heroImg);
+
+    expect(iconImgs.length).toBeGreaterThan(0);
+    for (const img of iconImgs) {
+      expect(img.getAttribute("loading")).toBe("lazy");
+    }
+  });
+
   it("does not call getAllGames on every render", async () => {
     const spy = vi.spyOn(gameRegistry, "getAllGames");
 
