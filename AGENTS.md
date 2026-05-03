@@ -41,14 +41,14 @@ bridge-trainer/
 
 ## Build, Test, and Development Commands
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Start Vite dev server on port 3000 with HMR |
-| `pnpm build` | Build client (Vite) + server (esbuild) to `dist/` |
-| `pnpm start` | Run production server from `dist/` |
-| `pnpm preview` | Preview production build locally |
-| `pnpm check` | TypeScript type checking (`tsc --noEmit`) |
-| `pnpm format` | Format all files with Prettier |
+| Command        | Description                                       |
+| -------------- | ------------------------------------------------- |
+| `pnpm dev`     | Start Vite dev server on port 3000 with HMR       |
+| `pnpm build`   | Build client (Vite) + server (esbuild) to `dist/` |
+| `pnpm start`   | Run production server from `dist/`                |
+| `pnpm preview` | Preview production build locally                  |
+| `pnpm check`   | TypeScript type checking (`tsc --noEmit`)         |
+| `pnpm format`  | Format all files with Prettier                    |
 
 Package manager is **pnpm** (not npm or yarn).
 

@@ -12,14 +12,14 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import GamePage from "./pages/GamePage";
-import History from './pages/History';
-import ConventionReference from './pages/ConventionReference';
+import History from "./pages/History";
+import ConventionReference from "./pages/ConventionReference";
 
 // Register all games (side-effect imports)
-import './lib/conventionData';
-import './games/pointCounting/index';
-import './games/openingBid/index';
-import './games/responding/index';
+import "./lib/conventionData";
+import "./games/pointCounting/index";
+import "./games/openingBid/index";
+import "./games/responding/index";
 
 function Router() {
   return (

@@ -3,23 +3,42 @@
 // Card Table Modernist theme
 // ============================================================
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getAllSessions, getCompletedSessionStats, deleteSession, type GameSession } from '@/lib/db';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Trash2, TrendingUp, Target, Clock, Trophy } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  getAllSessions,
+  getCompletedSessionStats,
+  deleteSession,
+  type GameSession,
+} from "@/lib/db";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Trash2, TrendingUp, Target, Clock, Trophy } from "lucide-react";
+import { motion } from "framer-motion";
 
 const GAME_NAMES: Record<string, string> = {
-  'point-counting': 'Point Counting',
-  'opening-bid': 'Opening Bid',
+  "point-counting": "Point Counting",
+  "opening-bid": "Opening Bid",
 };
 
 export default function History() {
   const [sessions, setSessions] = useState<GameSession[]>([]);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState("all");
   const [stats, setStats] = useState<{
     totalSessions: number;
     avgAccuracy: number;
@@ -32,12 +51,12 @@ export default function History() {
     const allSessions = await getAllSessions();
     setSessions(allSessions);
 
-    if (filter !== 'all') {
+    if (filter !== "all") {
       const s = await getCompletedSessionStats(filter);
       setStats(s);
     } else {
       // Aggregate stats across all game types
-      const gameTypes = Array.from(new Set(allSessions.map((s) => s.gameType)));
+      const gameTypes = Array.from(new Set(allSessions.map(s => s.gameType)));
       let totalSessions = 0;
       let totalAccuracy = 0;
       let totalTime = 0;
@@ -58,7 +77,9 @@ export default function History() {
         avgAccuracy: totalSessions > 0 ? totalAccuracy / totalSessions : 0,
         avgTime: totalSessions > 0 ? totalTime / totalSessions : 0,
         bestAccuracy,
-        recentTrend: allTrend.sort((a, b) => a.date.localeCompare(b.date)).slice(-20),
+        recentTrend: allTrend
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .slice(-20),
       });
     }
   };
@@ -72,9 +93,8 @@ export default function History() {
     loadData();
   };
 
-  const filteredSessions = filter === 'all'
-    ? sessions
-    : sessions.filter((s) => s.gameType === filter);
+  const filteredSessions =
+    filter === "all" ? sessions : sessions.filter(s => s.gameType === filter);
 
   return (
     <div className="space-y-6">
@@ -132,20 +152,20 @@ export default function History() {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-                    tickFormatter={(v) => `${v}%`}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                    tickFormatter={v => `${v}%`}
                   />
                   <Tooltip
-                    formatter={(value: number) => [`${value}%`, 'Accuracy']}
+                    formatter={(value: number) => [`${value}%`, "Accuracy"]}
                     contentStyle={{
-                      backgroundColor: 'var(--card)',
-                      border: '1px solid var(--border)',
-                      borderRadius: '8px',
-                      fontSize: '12px',
+                      backgroundColor: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "8px",
+                      fontSize: "12px",
                     }}
                   />
                   <Line
@@ -153,7 +173,7 @@ export default function History() {
                     dataKey="accuracy"
                     stroke="var(--chart-1)"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: 'var(--chart-1)' }}
+                    dot={{ r: 3, fill: "var(--chart-1)" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -166,7 +186,9 @@ export default function History() {
       {filteredSessions.length === 0 ? (
         <Card className="border-border/50 shadow-sm">
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground font-serif">No sessions yet. Play some games to see your history!</p>
+            <p className="text-muted-foreground font-serif">
+              No sessions yet. Play some games to see your history!
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -187,7 +209,15 @@ export default function History() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <Card className="border-border/50 shadow-sm">
       <CardContent className="py-3 px-4">
@@ -201,7 +231,13 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
   );
 }
 
-function SessionRow({ session, onDelete }: { session: GameSession; onDelete: (id: string) => void }) {
+function SessionRow({
+  session,
+  onDelete,
+}: {
+  session: GameSession;
+  onDelete: (id: string) => void;
+}) {
   const date = new Date(session.startedAt);
   const pct = Math.round(session.accuracy * 100);
 
@@ -219,7 +255,8 @@ function SessionRow({ session, onDelete }: { session: GameSession; onDelete: (id
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          {date.toLocaleDateString()} at {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {date.toLocaleDateString()} at{" "}
+          {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </p>
       </div>
       <div className="text-right shrink-0">

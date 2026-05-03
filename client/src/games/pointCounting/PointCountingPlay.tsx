@@ -4,19 +4,28 @@
 // Full keyboard support: number keys, arrows, Enter/Space/N
 // ============================================================
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import CardDisplay from '@/components/CardDisplay';
-import DisplayModeToggle from '@/components/DisplayModeToggle';
-import GameShell from '@/components/GameShell';
-import { generateRandomHand, calculateHCP, generateHCPChoices, type BridgeHand } from '@/lib/bridge';
-import { nanoid } from 'nanoid';
-import { saveSession, saveHandResult } from '@/lib/db';
-import type { GameSettings, GameResults, HandResultData } from '@/lib/gameRegistry';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, ArrowRight } from 'lucide-react';
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import CardDisplay from "@/components/CardDisplay";
+import DisplayModeToggle from "@/components/DisplayModeToggle";
+import GameShell from "@/components/GameShell";
+import {
+  generateRandomHand,
+  calculateHCP,
+  generateHCPChoices,
+  type BridgeHand,
+} from "@/lib/bridge";
+import { nanoid } from "nanoid";
+import { saveSession, saveHandResult } from "@/lib/db";
+import type {
+  GameSettings,
+  GameResults,
+  HandResultData,
+} from "@/lib/gameRegistry";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, X, ArrowRight } from "lucide-react";
 
 interface Props {
   settings: GameSettings;
@@ -24,25 +33,35 @@ interface Props {
   onQuit: () => void;
 }
 
-export default function PointCountingPlay({ settings, onComplete, onQuit }: Props) {
+export default function PointCountingPlay({
+  settings,
+  onComplete,
+  onQuit,
+}: Props) {
   const sessionId = useRef(nanoid());
   const startTime = useRef(Date.now());
   const handStartTime = useRef(Date.now());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hand, setHand] = useState<BridgeHand>(() => generateRandomHand());
   const [correctAnswer, setCorrectAnswer] = useState(() => calculateHCP(hand));
-  const [choices, setChoices] = useState(() => generateHCPChoices(correctAnswer));
-  const [userInput, setUserInput] = useState('');
+  const [choices, setChoices] = useState(() =>
+    generateHCPChoices(correctAnswer)
+  );
+  const [userInput, setUserInput] = useState("");
   const [displayMode, setDisplayMode] = useState(settings.displayMode);
   const [results, setResults] = useState<HandResultData[]>([]);
-  const [feedback, setFeedback] = useState<{ isCorrect: boolean; correct: number; user: string } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    isCorrect: boolean;
+    correct: number;
+    user: string;
+  } | null>(null);
   const [timerKey, setTimerKey] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const isEasy = settings.difficulty === 'easy';
+  const isEasy = settings.difficulty === "easy";
 
   const generateNewHand = useCallback(() => {
     const newHand = generateRandomHand();
@@ -50,11 +69,11 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
     setHand(newHand);
     setCorrectAnswer(hcp);
     setChoices(generateHCPChoices(hcp));
-    setUserInput('');
+    setUserInput("");
     setFeedback(null);
     setSelectedIndex(0);
     handStartTime.current = Date.now();
-    setTimerKey((k) => k + 1);
+    setTimerKey(k => k + 1);
     setIsTimerRunning(true);
   }, []);
 
@@ -91,13 +110,20 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
         timestamp: Date.now(),
       });
 
-      if (settings.feedbackMode === 'immediate') {
+      if (settings.feedbackMode === "immediate") {
         setFeedback({ isCorrect, correct: correctAnswer, user: answer });
       } else {
         proceedToNext(newResults);
       }
     },
-    [feedback, correctAnswer, currentIndex, hand, results, settings.feedbackMode]
+    [
+      feedback,
+      correctAnswer,
+      currentIndex,
+      hand,
+      results,
+      settings.feedbackMode,
+    ]
   );
 
   const proceedToNext = useCallback(
@@ -105,7 +131,7 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
       if (currentIndex + 1 >= settings.handCount) {
         finishSession(currentResults);
       } else {
-        setCurrentIndex((i) => i + 1);
+        setCurrentIndex(i => i + 1);
         generateNewHand();
       }
     },
@@ -117,22 +143,27 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
   }, [proceedToNext, results]);
 
   const handleTimeUp = useCallback(() => {
-    submitAnswer('-1');
+    submitAnswer("-1");
   }, [submitAnswer]);
 
   const finishSession = useCallback(
     (finalResults: HandResultData[]) => {
-      const totalCorrect = finalResults.filter((r) => r.isCorrect).length;
+      const totalCorrect = finalResults.filter(r => r.isCorrect).length;
       const totalTime = Date.now() - startTime.current;
-      const avgTime = finalResults.reduce((sum, r) => sum + r.timeTaken, 0) / finalResults.length;
+      const avgTime =
+        finalResults.reduce((sum, r) => sum + r.timeTaken, 0) /
+        finalResults.length;
       const accuracy = totalCorrect / finalResults.length;
 
       const avgHCP =
-        finalResults.reduce((sum, r) => sum + parseInt(r.correctAnswer, 10), 0) / finalResults.length;
+        finalResults.reduce(
+          (sum, r) => sum + parseInt(r.correctAnswer, 10),
+          0
+        ) / finalResults.length;
 
       const gameResults: GameResults = {
         sessionId: sessionId.current,
-        gameId: 'point-counting',
+        gameId: "point-counting",
         settings,
         hands: finalResults,
         totalCorrect,
@@ -145,7 +176,7 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
 
       saveSession({
         id: sessionId.current,
-        gameType: 'point-counting',
+        gameType: "point-counting",
         startedAt: startTime.current,
         completedAt: Date.now(),
         isComplete: true,
@@ -164,13 +195,16 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
   );
 
   const handleQuit = useCallback(() => {
-    const totalCorrect = results.filter((r) => r.isCorrect).length;
+    const totalCorrect = results.filter(r => r.isCorrect).length;
     const totalTime = Date.now() - startTime.current;
-    const avgTime = results.length > 0 ? results.reduce((sum, r) => sum + r.timeTaken, 0) / results.length : 0;
+    const avgTime =
+      results.length > 0
+        ? results.reduce((sum, r) => sum + r.timeTaken, 0) / results.length
+        : 0;
 
     saveSession({
       id: sessionId.current,
-      gameType: 'point-counting',
+      gameType: "point-counting",
       startedAt: startTime.current,
       completedAt: Date.now(),
       isComplete: false,
@@ -205,11 +239,11 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't handle if typing in input (except Enter)
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' && e.key !== 'Enter') return;
+      if (target.tagName === "INPUT" && e.key !== "Enter") return;
 
       // When feedback is showing, handle next-hand shortcuts
       if (feedback) {
-        if (e.key === 'Enter' || e.key === ' ' || e.key.toLowerCase() === 'n') {
+        if (e.key === "Enter" || e.key === " " || e.key.toLowerCase() === "n") {
           e.preventDefault();
           handleNext();
           return;
@@ -228,19 +262,19 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
         }
 
         // Arrow key navigation
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") {
           e.preventDefault();
-          setSelectedIndex((prev) => Math.min(prev + 1, choices.length - 1));
+          setSelectedIndex(prev => Math.min(prev + 1, choices.length - 1));
           return;
         }
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
           e.preventDefault();
-          setSelectedIndex((prev) => Math.max(prev - 1, 0));
+          setSelectedIndex(prev => Math.max(prev - 1, 0));
           return;
         }
 
         // Enter to submit selected
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
           e.preventDefault();
           submitAnswer(String(choices[selectedIndex]));
           return;
@@ -248,8 +282,8 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [feedback, isEasy, choices, selectedIndex, submitAnswer, handleNext]);
 
   return (
@@ -300,8 +334,8 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
                         variant="outline"
                         className={`h-12 font-mono text-lg font-semibold relative transition-all ${
                           selectedIndex === idx
-                            ? 'ring-2 ring-primary ring-offset-1 bg-primary/5'
-                            : ''
+                            ? "ring-2 ring-primary ring-offset-1 bg-primary/5"
+                            : ""
                         }`}
                         onClick={() => submitAnswer(String(choice))}
                       >
@@ -314,7 +348,7 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
                   </div>
                 ) : (
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={e => {
                       e.preventDefault();
                       if (userInput.trim()) submitAnswer(userInput.trim());
                     }}
@@ -326,11 +360,15 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
                       min={0}
                       max={37}
                       value={userInput}
-                      onChange={(e) => setUserInput(e.target.value)}
+                      onChange={e => setUserInput(e.target.value)}
                       placeholder="HCP"
                       className="text-center font-mono text-lg h-12"
                     />
-                    <Button type="submit" size="lg" disabled={!userInput.trim()}>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={!userInput.trim()}
+                    >
                       Submit
                     </Button>
                   </form>
@@ -345,9 +383,10 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
               >
                 <div
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
-                    ${feedback.isCorrect
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : 'bg-red-50 text-red-700 border border-red-200'
+                    ${
+                      feedback.isCorrect
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-red-50 text-red-700 border border-red-200"
                     }`}
                 >
                   {feedback.isCorrect ? (
@@ -358,18 +397,31 @@ export default function PointCountingPlay({ settings, onComplete, onQuit }: Prop
                   ) : (
                     <>
                       <X className="w-4 h-4" />
-                      {feedback.user === '-1' ? "Time's up!" : `You said ${feedback.user}`} — correct answer: {feedback.correct} HCP
+                      {feedback.user === "-1"
+                        ? "Time's up!"
+                        : `You said ${feedback.user}`}{" "}
+                      — correct answer: {feedback.correct} HCP
                     </>
                   )}
                 </div>
                 <div>
                   <Button onClick={handleNext} variant="default" size="sm">
-                    {currentIndex + 1 >= settings.handCount ? 'See Results' : 'Next Hand'}
+                    {currentIndex + 1 >= settings.handCount
+                      ? "See Results"
+                      : "Next Hand"}
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </div>
                 <p className="text-[10px] text-muted-foreground">
-                  Press <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">Enter</kbd> or <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">Space</kbd> to continue
+                  Press{" "}
+                  <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">
+                    Enter
+                  </kbd>{" "}
+                  or{" "}
+                  <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">
+                    Space
+                  </kbd>{" "}
+                  to continue
                 </p>
               </motion.div>
             )}

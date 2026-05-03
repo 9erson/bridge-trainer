@@ -3,13 +3,13 @@
 // Card Table Modernist theme — clean, functional, inviting
 // ============================================================
 
-import { useLocation } from 'wouter';
-import { getAllGames } from '@/lib/gameRegistry';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useLocation } from "wouter";
+import { getAllGames } from "@/lib/gameRegistry";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
-const HERO_IMAGE = '/manus-storage/hero-banner_bc20a37b.png';
+const HERO_IMAGE = "/manus-storage/hero-banner_bc20a37b.png";
 
 // The game registry is static after module-load — hoist to module scope
 // so we don't allocate a new array on every Home render.
@@ -33,8 +33,8 @@ export default function Home() {
             Bridge Trainer
           </h1>
           <p className="text-sm sm:text-base text-white/80 font-serif max-w-md">
-            Sharpen your bridge skills with focused practice sessions.
-            Choose a game below to get started.
+            Sharpen your bridge skills with focused practice sessions. Choose a
+            game below to get started.
           </p>
         </div>
       </div>
@@ -66,8 +66,10 @@ export default function Home() {
                       <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                         {game.config.name}
                       </h3>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary
-                                             group-hover:translate-x-0.5 transition-all shrink-0" />
+                      <ArrowRight
+                        className="w-4 h-4 text-muted-foreground group-hover:text-primary
+                                             group-hover:translate-x-0.5 transition-all shrink-0"
+                      />
                     </div>
                     <p className="text-sm text-muted-foreground font-serif mt-1 line-clamp-2">
                       {game.config.description}

@@ -4,7 +4,7 @@
 // creating a module + registering it in this file.
 // ============================================================
 
-import type { ComponentType } from 'react';
+import type { ComponentType } from "react";
 
 export interface GameDifficulty {
   id: string;
@@ -21,14 +21,22 @@ export interface GameConfig {
   defaultHandCount: number;
   defaultTimerSeconds: number | null; // null = no timer
   defaultDifficulty: string;
-  defaultFeedbackMode: 'immediate' | 'end';
+  defaultFeedbackMode: "immediate" | "end";
 }
 
 export interface GameModule {
   config: GameConfig;
   SetupComponent: ComponentType<{ onStart: (settings: GameSettings) => void }>;
-  PlayComponent: ComponentType<{ settings: GameSettings; onComplete: (results: GameResults) => void; onQuit: () => void }>;
-  ResultsComponent: ComponentType<{ results: GameResults; onPlayAgain: () => void; onBackToMenu: () => void }>;
+  PlayComponent: ComponentType<{
+    settings: GameSettings;
+    onComplete: (results: GameResults) => void;
+    onQuit: () => void;
+  }>;
+  ResultsComponent: ComponentType<{
+    results: GameResults;
+    onPlayAgain: () => void;
+    onBackToMenu: () => void;
+  }>;
 }
 
 export interface GameSettings {
@@ -36,8 +44,8 @@ export interface GameSettings {
   difficulty: string;
   handCount: number;
   timerSeconds: number | null;
-  feedbackMode: 'immediate' | 'end';
-  displayMode: 'text' | 'graphic';
+  feedbackMode: "immediate" | "end";
+  displayMode: "text" | "graphic";
   // Game-specific settings
   extra: Record<string, unknown>;
 }

@@ -21,11 +21,9 @@ vi.mock("framer-motion", () => ({
       [key: string]: unknown;
     }) => <div data-testid="motion-div">{children}</div>,
   },
-  AnimatePresence: ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 // Simple wrapper providing wouter context
@@ -84,10 +82,10 @@ describe("Layout", () => {
     // min-h-[44px] and min-w-[44px] ensure WCAG 2.5.8 compliance.
     const classList = Array.from(hamburger!.classList);
     const hasMinHeight44 = classList.some(
-      (c) => c === "min-h-[44px]" || c === "min-h-11"
+      c => c === "min-h-[44px]" || c === "min-h-11"
     );
     const hasMinWidth44 = classList.some(
-      (c) => c === "min-w-[44px]" || c === "min-w-11"
+      c => c === "min-w-[44px]" || c === "min-w-11"
     );
 
     expect(hasMinHeight44).toBe(true);

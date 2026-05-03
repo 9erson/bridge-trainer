@@ -17,17 +17,20 @@ Think of the physical objects in a bridge player's world: green baize felt, gilt
 **Visual tone**: Refined traditionalism — classic card-room atmosphere rendered with modern web craft. The Swiss-typographic "Card Table Modernist" direction is the right neighborhood, but it should lean warmer and more inviting than strictly minimal.
 
 **References** (spiritual, not literal):
+
 - The typography and restraint of a fine print book or broadsheet
 - The color palette of a card table: green felt, warm cream, gold leaf, dark wood
 - The quiet confidence of luxury stationery (monogrammed cards, wax seals)
 
 **Anti-references** (explicitly NOT this):
+
 - Neon/glowing dark mode with cyan accents (trendy crypto/gaming aesthetic)
 - Playful/cartoony illustrations (undermines the classic tone)
 - Dense dashboard-style layouts with metric cards and sparklines
 - Generic SaaS admin panel with Inter and blue buttons
 
 **Theme**: Both light and dark, user-switchable.
+
 - **Light**: Warm cream background, emerald green accents, gold highlights. Like a sunlit card room.
 - **Dark**: Deep green-black background (card table at night), lighter emerald accents, warm gold. Soft, not harsh — imagine reading under a green-shaded banker's lamp.
 
@@ -42,6 +45,7 @@ Think of the physical objects in a bridge player's world: green baize felt, gilt
 ## Color Direction
 
 **Light palette**:
+
 - Background: warm cream (oklch ~0.97, tinted toward yellow hue 90)
 - Text: dark charcoal with warm tint (oklch ~0.20)
 - Primary: deep emerald green (oklch ~0.35, hue 165)
@@ -49,6 +53,7 @@ Think of the physical objects in a bridge player's world: green baize felt, gilt
 - Surfaces: warm off-white with subtle green tint
 
 **Dark palette**:
+
 - Background: very dark green-black (oklch ~0.15, hue 165)
 - Text: warm off-white (oklch ~0.92)
 - Primary: lighter emerald (oklch ~0.55, hue 165)

@@ -2,13 +2,19 @@
 // OpeningBidSetup — config panel with convention selector
 // ============================================================
 
-import { useState } from 'react';
-import GameSetup from '@/components/GameSetup';
-import { openingBidConfig } from './index';
-import { getAllConventions } from '@/lib/conventions';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { GameSettings } from '@/lib/gameRegistry';
+import { useState } from "react";
+import GameSetup from "@/components/GameSetup";
+import { openingBidConfig } from "./index";
+import { getAllConventions } from "@/lib/conventions";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { GameSettings } from "@/lib/gameRegistry";
 
 interface Props {
   onStart: (settings: GameSettings) => void;
@@ -16,7 +22,9 @@ interface Props {
 
 export default function OpeningBidSetup({ onStart }: Props) {
   const conventions = getAllConventions();
-  const [conventionId, setConventionId] = useState(conventions[0]?.id ?? 'sayc');
+  const [conventionId, setConventionId] = useState(
+    conventions[0]?.id ?? "sayc"
+  );
 
   const handleStart = (settings: GameSettings) => {
     onStart({
@@ -33,7 +41,7 @@ export default function OpeningBidSetup({ onStart }: Props) {
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {conventions.map((c) => (
+          {conventions.map(c => (
             <SelectItem key={c.id} value={c.id}>
               <div>
                 <span className="font-medium">{c.name}</span>
@@ -42,9 +50,9 @@ export default function OpeningBidSetup({ onStart }: Props) {
           ))}
         </SelectContent>
       </Select>
-      {conventions.find((c) => c.id === conventionId) && (
+      {conventions.find(c => c.id === conventionId) && (
         <p className="text-xs text-muted-foreground font-serif">
-          {conventions.find((c) => c.id === conventionId)?.description}
+          {conventions.find(c => c.id === conventionId)?.description}
         </p>
       )}
     </div>

@@ -2,8 +2,8 @@
 // Timer — countdown timer with visual progress bar
 // ============================================================
 
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { Progress } from '@/components/ui/progress';
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Progress } from "@/components/ui/progress";
 
 interface TimerProps {
   seconds: number;
@@ -28,7 +28,7 @@ export default function Timer({ seconds, isRunning, onTimeUp }: TimerProps) {
     if (!isRunning) return;
 
     const interval = setInterval(() => {
-      setRemaining((prev) => {
+      setRemaining(prev => {
         const next = prev - 100;
         if (next <= 0) {
           clearInterval(interval);
@@ -50,11 +50,11 @@ export default function Timer({ seconds, isRunning, onTimeUp }: TimerProps) {
     <div className="flex items-center gap-3 w-full">
       <Progress
         value={progress}
-        className={`h-2 flex-1 ${isUrgent ? '[&>div]:bg-destructive' : '[&>div]:bg-primary'}`}
+        className={`h-2 flex-1 ${isUrgent ? "[&>div]:bg-destructive" : "[&>div]:bg-primary"}`}
       />
       <span
         className={`font-mono text-sm font-semibold min-w-[2.5rem] text-right tabular-nums
-          ${isUrgent ? 'text-destructive' : 'text-muted-foreground'}`}
+          ${isUrgent ? "text-destructive" : "text-muted-foreground"}`}
       >
         {displaySeconds}s
       </span>

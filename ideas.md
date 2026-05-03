@@ -7,6 +7,7 @@
 **Design Movement:** Swiss/International Typographic Style meets card table aesthetics
 
 **Core Principles:**
+
 1. Information density without clutter — every pixel serves a purpose
 2. Strong typographic hierarchy with geometric precision
 3. Subtle card-table materiality (felt texture, card shadows) as accent, not theme
@@ -17,6 +18,7 @@
 **Layout Paradigm:** Left sidebar navigation (collapsible on mobile) with a wide content area. Game sessions use a centered card display zone with settings in a slide-out panel. Asymmetric grid for stats/history.
 
 **Signature Elements:**
+
 - Subtle linen/felt texture on the main content background
 - Cards with realistic drop shadows and slight rotation on hover
 - Progress indicators styled as card-deck thickness metaphor
@@ -37,6 +39,7 @@
 **Design Movement:** Data-visualization-first design, inspired by Bloomberg Terminal aesthetics but accessible
 
 **Core Principles:**
+
 1. Numbers and data are first-class citizens — large, clear, scannable
 2. High contrast with purposeful color coding
 3. Dense information layout with clear visual boundaries
@@ -47,6 +50,7 @@
 **Layout Paradigm:** Fixed top toolbar with game selector tabs. Main area splits into card display (60%) and live stats panel (40%) during gameplay. Full-width results view after session.
 
 **Signature Elements:**
+
 - Real-time stat counters that animate as you play
 - Sparkline mini-charts embedded in session cards
 - Color-coded suit pills (♠ black, ♥ red, ♦ orange-red, ♣ dark green)
@@ -67,6 +71,7 @@
 **Design Movement:** Japanese-inspired minimalism (Wabi-sabi meets digital craft)
 
 **Core Principles:**
+
 1. Generous breathing room — content floats in space
 2. Restrained palette with one deliberate accent
 3. Tactile quality through subtle material hints (paper, wood grain borders)
@@ -77,6 +82,7 @@
 **Layout Paradigm:** Single-column centered flow for gameplay (max-width 720px). Navigation as a minimal top bar with icon-only items. Settings revealed through elegant slide-down panels. No sidebar — maximum focus.
 
 **Signature Elements:**
+
 - Thin hairline borders with rounded ends (like brush strokes)
 - Cards displayed on a subtle off-white "paper" surface with the faintest shadow
 - Section dividers using a single thin line with a small diamond ornament

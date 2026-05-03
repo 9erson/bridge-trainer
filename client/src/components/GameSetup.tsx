@@ -3,15 +3,27 @@
 // Each game can extend with custom settings via children
 // ============================================================
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
-import { Play, Settings2 } from 'lucide-react';
-import type { GameConfig, GameSettings } from '@/lib/gameRegistry';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Play, Settings2 } from "lucide-react";
+import type { GameConfig, GameSettings } from "@/lib/gameRegistry";
 
 interface GameSetupProps {
   config: GameConfig;
@@ -20,13 +32,24 @@ interface GameSetupProps {
   extraDefaults?: Record<string, unknown>;
 }
 
-export default function GameSetup({ config, onStart, extraSettings, extraDefaults }: GameSetupProps) {
+export default function GameSetup({
+  config,
+  onStart,
+  extraSettings,
+  extraDefaults,
+}: GameSetupProps) {
   const [difficulty, setDifficulty] = useState(config.defaultDifficulty);
   const [handCount, setHandCount] = useState(config.defaultHandCount);
-  const [timerEnabled, setTimerEnabled] = useState(config.defaultTimerSeconds !== null);
-  const [timerSeconds, setTimerSeconds] = useState(config.defaultTimerSeconds ?? 15);
-  const [feedbackMode, setFeedbackMode] = useState<'immediate' | 'end'>(config.defaultFeedbackMode);
-  const [displayMode, setDisplayMode] = useState<'text' | 'graphic'>('text');
+  const [timerEnabled, setTimerEnabled] = useState(
+    config.defaultTimerSeconds !== null
+  );
+  const [timerSeconds, setTimerSeconds] = useState(
+    config.defaultTimerSeconds ?? 15
+  );
+  const [feedbackMode, setFeedbackMode] = useState<"immediate" | "end">(
+    config.defaultFeedbackMode
+  );
+  const [displayMode, setDisplayMode] = useState<"text" | "graphic">("text");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleStart = () => {
@@ -45,7 +68,9 @@ export default function GameSetup({ config, onStart, extraSettings, extraDefault
     <Card className="w-full max-w-lg mx-auto border-border/50 shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl">{config.name}</CardTitle>
-        <CardDescription className="font-serif">{config.description}</CardDescription>
+        <CardDescription className="font-serif">
+          {config.description}
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
         {/* Difficulty */}
@@ -56,11 +81,13 @@ export default function GameSetup({ config, onStart, extraSettings, extraDefault
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {config.difficulties.map((d) => (
+              {config.difficulties.map(d => (
                 <SelectItem key={d.id} value={d.id}>
                   <div>
                     <span className="font-medium">{d.label}</span>
-                    <span className="text-muted-foreground text-xs ml-2">{d.description}</span>
+                    <span className="text-muted-foreground text-xs ml-2">
+                      {d.description}
+                    </span>
                   </div>
                 </SelectItem>
               ))}
@@ -72,7 +99,9 @@ export default function GameSetup({ config, onStart, extraSettings, extraDefault
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-medium">Hands per session</Label>
-            <span className="font-mono text-sm text-muted-foreground">{handCount}</span>
+            <span className="font-mono text-sm text-muted-foreground">
+              {handCount}
+            </span>
           </div>
           <Slider
             value={[handCount]}
@@ -87,7 +116,10 @@ export default function GameSetup({ config, onStart, extraSettings, extraDefault
         {/* Display mode */}
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">Card display</Label>
-          <Select value={displayMode} onValueChange={(v) => setDisplayMode(v as 'text' | 'graphic')}>
+          <Select
+            value={displayMode}
+            onValueChange={v => setDisplayMode(v as "text" | "graphic")}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -107,7 +139,7 @@ export default function GameSetup({ config, onStart, extraSettings, extraDefault
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <Settings2 className="w-3.5 h-3.5" />
-          {showAdvanced ? 'Hide' : 'Show'} advanced settings
+          {showAdvanced ? "Hide" : "Show"} advanced settings
         </button>
 
         {showAdvanced && (
@@ -116,7 +148,10 @@ export default function GameSetup({ config, onStart, extraSettings, extraDefault
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">Timer</Label>
-                <Switch checked={timerEnabled} onCheckedChange={setTimerEnabled} />
+                <Switch
+                  checked={timerEnabled}
+                  onCheckedChange={setTimerEnabled}
+                />
               </div>
               {timerEnabled && (
                 <div className="flex items-center gap-3">
@@ -138,7 +173,10 @@ export default function GameSetup({ config, onStart, extraSettings, extraDefault
             {/* Feedback mode */}
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Feedback</Label>
-              <Select value={feedbackMode} onValueChange={(v) => setFeedbackMode(v as 'immediate' | 'end')}>
+              <Select
+                value={feedbackMode}
+                onValueChange={v => setFeedbackMode(v as "immediate" | "end")}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>

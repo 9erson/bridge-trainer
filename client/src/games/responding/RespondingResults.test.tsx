@@ -50,7 +50,7 @@ describe("RespondingResults", () => {
         results={results}
         onPlayAgain={() => {}}
         onBackToMenu={() => {}}
-      />,
+      />
     );
 
     // Expand the "Review Hands" section
@@ -61,7 +61,7 @@ describe("RespondingResults", () => {
 
     // Find the span with inline style color for the timeout answer
     const timeoutSpan = Array.from(container.querySelectorAll("span")).find(
-      (span) => span.textContent?.includes("Time's up"),
+      span => span.textContent?.includes("Time's up")
     );
 
     expect(timeoutSpan).toBeTruthy();

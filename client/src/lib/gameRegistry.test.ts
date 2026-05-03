@@ -43,7 +43,7 @@ describe("gameRegistry", () => {
     registerGame(game);
 
     const all = getAllGames();
-    const found = all.find((g) => g.config.id === "test-reg");
+    const found = all.find(g => g.config.id === "test-reg");
     expect(found).toBeDefined();
     expect(found?.config.name).toBe("Test Registration");
   });

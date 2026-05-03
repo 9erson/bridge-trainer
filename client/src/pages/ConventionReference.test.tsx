@@ -32,7 +32,7 @@ describe("ConventionReference", () => {
     render(<ConventionReference />);
 
     const tagline = screen.getByText(
-      /Concise cheat-sheets for opening bids and key conventions/,
+      /Concise cheat-sheets for opening bids and key conventions/
     );
 
     // font-body is undefined in the project CSS — must use font-serif instead

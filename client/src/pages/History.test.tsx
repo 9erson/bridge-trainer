@@ -45,11 +45,9 @@ vi.mock("framer-motion", () => ({
       [key: string]: unknown;
     }) => <div data-testid="motion-div">{children}</div>,
   },
-  AnimatePresence: ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 // Mock recharts — it requires non-zero container dimensions jsdom doesn't provide.
@@ -70,7 +68,7 @@ vi.mock("recharts", () => ({
 // non-zero container dimensions that jsdom doesn't provide)
 const historySource = readFileSync(
   resolve(import.meta.dirname, "History.tsx"),
-  "utf-8",
+  "utf-8"
 );
 
 describe("History", () => {
@@ -83,7 +81,11 @@ describe("History", () => {
 
   it("uses var(--chart-1) for chart line stroke and dot fill", () => {
     expect(historySource).toContain('stroke="var(--chart-1)"');
-    expect(historySource).toContain("fill: 'var(--chart-1)'");
+    // Match either single or double quotes (Prettier may normalize)
+    const hasDotFill =
+      historySource.includes("fill: 'var(--chart-1)'") ||
+      historySource.includes('fill: "var(--chart-1)"');
+    expect(hasDotFill).toBe(true);
   });
 
   it("delete session button has aria-label", async () => {
@@ -103,7 +105,7 @@ describe("History", () => {
     );
     // There should be at least one button in the session rows
     const deleteButton = Array.from(deleteButtons).find(
-      (b) => b.querySelector("svg") !== null && b.textContent?.trim() === ""
+      b => b.querySelector("svg") !== null && b.textContent?.trim() === ""
     );
     expect(deleteButton).toBeDefined();
 

@@ -17,17 +17,17 @@ describe("CardDisplay", () => {
   describe("MiniCard graphic mode", () => {
     it("uses the theme-aware bg-card class instead of hard-coded bg-white", () => {
       const { container } = render(
-        <CardDisplay hand={graphicHand} mode="graphic" />,
+        <CardDisplay hand={graphicHand} mode="graphic" />
       );
 
       // Find all MiniCard divs (direct children of motion.div wrappers)
       const miniCards = container.querySelectorAll(
-        ".rounded-md.border-border\\/60",
+        ".rounded-md.border-border\\/60"
       );
 
       expect(miniCards.length).toBeGreaterThan(0);
 
-      Array.from(miniCards).forEach((card) => {
+      Array.from(miniCards).forEach(card => {
         expect(card.className).toContain("bg-card");
         expect(card.className).not.toContain("bg-white");
       });

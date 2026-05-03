@@ -5,11 +5,11 @@
 // Supports both controlled (isOpen/onToggle) and uncontrolled modes.
 // ============================================================
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { getConventionRef } from '@/lib/conventionReferenceData';
-import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { getConventionRef } from "@/lib/conventionReferenceData";
+import { BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   conventionId: string;
@@ -21,12 +21,16 @@ function renderBidInline(bid: string): string {
   return bid;
 }
 
-export default function InlineReference({ conventionId, isOpen: controlledOpen, onToggle }: Props) {
+export default function InlineReference({
+  conventionId,
+  isOpen: controlledOpen,
+  onToggle,
+}: Props) {
   const [internalOpen, setInternalOpen] = useState(false);
 
   // Use controlled mode if props provided, otherwise internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
-  const toggle = onToggle || (() => setInternalOpen((prev) => !prev));
+  const toggle = onToggle || (() => setInternalOpen(prev => !prev));
 
   const conv = getConventionRef(conventionId);
 
@@ -41,18 +45,24 @@ export default function InlineReference({ conventionId, isOpen: controlledOpen, 
         onClick={toggle}
       >
         <BookOpen className="w-3.5 h-3.5" />
-        <span>{isOpen ? 'Hide' : 'Show'} Reference — {conv.name}</span>
+        <span>
+          {isOpen ? "Hide" : "Show"} Reference — {conv.name}
+        </span>
         <kbd className="ml-1 px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono text-muted-foreground/60">
           H
         </kbd>
-        {isOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        {isOpen ? (
+          <ChevronUp className="w-3.5 h-3.5" />
+        ) : (
+          <ChevronDown className="w-3.5 h-3.5" />
+        )}
       </Button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
@@ -67,19 +77,32 @@ export default function InlineReference({ conventionId, isOpen: controlledOpen, 
                   <table className="w-full text-xs">
                     <thead>
                       <tr className="border-b border-border/50">
-                        <th className="text-left py-1 pr-2 font-semibold text-muted-foreground w-14">Bid</th>
-                        <th className="text-left py-1 pr-2 font-semibold text-muted-foreground w-16">HCP</th>
-                        <th className="text-left py-1 font-semibold text-muted-foreground">Requirement</th>
+                        <th className="text-left py-1 pr-2 font-semibold text-muted-foreground w-14">
+                          Bid
+                        </th>
+                        <th className="text-left py-1 pr-2 font-semibold text-muted-foreground w-16">
+                          HCP
+                        </th>
+                        <th className="text-left py-1 font-semibold text-muted-foreground">
+                          Requirement
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {conv.openingBids.map((row, i) => (
-                        <tr key={i} className="border-b border-border/30 last:border-0">
+                        <tr
+                          key={i}
+                          className="border-b border-border/30 last:border-0"
+                        >
                           <td className="py-1 pr-2 font-mono font-bold text-foreground">
                             {renderBidInline(row.bid)}
                           </td>
-                          <td className="py-1 pr-2 font-mono text-muted-foreground">{row.hcp}</td>
-                          <td className="py-1 text-foreground/70">{row.description}</td>
+                          <td className="py-1 pr-2 font-mono text-muted-foreground">
+                            {row.hcp}
+                          </td>
+                          <td className="py-1 text-foreground/70">
+                            {row.description}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -94,7 +117,10 @@ export default function InlineReference({ conventionId, isOpen: controlledOpen, 
                 </h4>
                 <ul className="space-y-1">
                   {conv.keyRules.map((rule, i) => (
-                    <li key={i} className="text-xs text-foreground/70 flex gap-1.5">
+                    <li
+                      key={i}
+                      className="text-xs text-foreground/70 flex gap-1.5"
+                    >
                       <span className="text-primary font-bold shrink-0">•</span>
                       <span>{rule}</span>
                     </li>

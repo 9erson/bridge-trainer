@@ -4,12 +4,12 @@
 // Collapsible on mobile
 // ============================================================
 
-import { useState } from 'react';
-import { useLocation, Link } from 'wouter';
-import { getAllGames } from '@/lib/gameRegistry';
-import { Spade, History, Menu, X, ChevronRight, BookOpen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from "react";
+import { useLocation, Link } from "wouter";
+import { getAllGames } from "@/lib/gameRegistry";
+import { Spade, History, Menu, X, ChevronRight, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 
 // The game registry is static after module-load — hoist to module scope
 // so we don't allocate a new array on every Layout render.
@@ -24,19 +24,27 @@ export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
-    { path: '/', label: 'Games', icon: <Spade className="w-4 h-4" /> },
-    ...games.map((g) => ({
+    { path: "/", label: "Games", icon: <Spade className="w-4 h-4" /> },
+    ...games.map(g => ({
       path: `/game/${g.config.id}`,
       label: g.config.name,
       icon: <ChevronRight className="w-3.5 h-3.5" />,
       indent: true,
     })),
-    { path: '/history', label: 'History', icon: <History className="w-4 h-4" /> },
-    { path: '/reference', label: 'Reference', icon: <BookOpen className="w-4 h-4" /> },
+    {
+      path: "/history",
+      label: "History",
+      icon: <History className="w-4 h-4" />,
+    },
+    {
+      path: "/reference",
+      label: "Reference",
+      icon: <BookOpen className="w-4 h-4" />,
+    },
   ];
 
   const isActive = (path: string) => {
-    if (path === '/') return location === '/';
+    if (path === "/") return location === "/";
     return location.startsWith(path);
   };
 
@@ -49,18 +57,21 @@ export default function Layout({ children }: LayoutProps) {
             <div className="w-8 h-8 rounded-md bg-sidebar-primary flex items-center justify-center">
               <Spade className="w-4 h-4 text-sidebar-primary-foreground" />
             </div>
-            <span className="font-bold text-sm text-sidebar-foreground">Bridge Trainer</span>
+            <span className="font-bold text-sm text-sidebar-foreground">
+              Bridge Trainer
+            </span>
           </Link>
         </div>
         <nav className="flex-1 p-3 space-y-0.5">
-          {navItems.map((item) => (
+          {navItems.map(item => (
             <Link key={item.path} href={item.path}>
               <div
                 className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors no-underline
-                  ${'indent' in item && item.indent ? 'pl-8' : ''}
-                  ${isActive(item.path)
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                  ${"indent" in item && item.indent ? "pl-8" : ""}
+                  ${
+                    isActive(item.path)
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                   }`}
               >
                 {item.icon}
@@ -81,7 +92,9 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex items-center justify-between px-4 h-12">
           <Link href="/" className="flex items-center gap-2 no-underline">
             <Spade className="w-4 h-4 text-sidebar-primary" />
-            <span className="font-bold text-sm text-sidebar-foreground">Bridge Trainer</span>
+            <span className="font-bold text-sm text-sidebar-foreground">
+              Bridge Trainer
+            </span>
           </Link>
           <Button
             variant="ghost"
@@ -91,7 +104,11 @@ export default function Layout({ children }: LayoutProps) {
             aria-expanded={sidebarOpen}
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {sidebarOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </Button>
         </div>
 
@@ -100,19 +117,20 @@ export default function Layout({ children }: LayoutProps) {
           {sidebarOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
+              animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden border-t border-sidebar-border"
             >
               <nav className="p-3 space-y-0.5">
-                {navItems.map((item) => (
+                {navItems.map(item => (
                   <Link key={item.path} href={item.path}>
                     <div
                       className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors no-underline
-                        ${'indent' in item && item.indent ? 'pl-8' : ''}
-                        ${isActive(item.path)
-                          ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                          : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50'
+                        ${"indent" in item && item.indent ? "pl-8" : ""}
+                        ${
+                          isActive(item.path)
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"
                         }`}
                       onClick={() => setSidebarOpen(false)}
                     >

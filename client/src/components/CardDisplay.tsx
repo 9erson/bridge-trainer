@@ -3,16 +3,24 @@
 // Card Table Modernist: clean SVG cards, grouped by suit
 // ============================================================
 
-import { type BridgeHand, type Suit, SUITS, SUIT_SYMBOLS, SUIT_COLORS, getCardsInSuit, getRankDisplay } from '@/lib/bridge';
-import { motion } from 'framer-motion';
+import {
+  type BridgeHand,
+  type Suit,
+  SUITS,
+  SUIT_SYMBOLS,
+  SUIT_COLORS,
+  getCardsInSuit,
+  getRankDisplay,
+} from "@/lib/bridge";
+import { motion } from "framer-motion";
 
 interface CardDisplayProps {
   hand: BridgeHand;
-  mode: 'text' | 'graphic';
+  mode: "text" | "graphic";
 }
 
 export default function CardDisplay({ hand, mode }: CardDisplayProps) {
-  if (mode === 'text') {
+  if (mode === "text") {
     return <TextDisplay hand={hand} />;
   }
   return <GraphicDisplay hand={hand} />;
@@ -21,7 +29,7 @@ export default function CardDisplay({ hand, mode }: CardDisplayProps) {
 function TextDisplay({ hand }: { hand: BridgeHand }) {
   return (
     <div className="space-y-2">
-      {SUITS.map((suit) => {
+      {SUITS.map(suit => {
         const cards = getCardsInSuit(hand, suit);
         return (
           <div key={suit} className="flex items-center gap-2">
@@ -32,7 +40,9 @@ function TextDisplay({ hand }: { hand: BridgeHand }) {
               {SUIT_SYMBOLS[suit]}
             </span>
             <span className="font-mono text-lg tracking-wider text-foreground">
-              {cards.length > 0 ? cards.map((c) => getRankDisplay(c.rank)).join(' ') : '—'}
+              {cards.length > 0
+                ? cards.map(c => getRankDisplay(c.rank)).join(" ")
+                : "—"}
             </span>
           </div>
         );
@@ -44,7 +54,7 @@ function TextDisplay({ hand }: { hand: BridgeHand }) {
 function GraphicDisplay({ hand }: { hand: BridgeHand }) {
   return (
     <div className="space-y-3">
-      {SUITS.map((suit) => {
+      {SUITS.map(suit => {
         const cards = getCardsInSuit(hand, suit);
         return (
           <div key={suit} className="flex items-center gap-1.5 flex-wrap">
@@ -60,7 +70,9 @@ function GraphicDisplay({ hand }: { hand: BridgeHand }) {
                 </motion.div>
               ))
             ) : (
-              <span className="text-muted-foreground text-sm italic ml-1">void</span>
+              <span className="text-muted-foreground text-sm italic ml-1">
+                void
+              </span>
             )}
           </div>
         );

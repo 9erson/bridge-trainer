@@ -12,11 +12,9 @@ vi.mock("framer-motion", () => ({
       [key: string]: unknown;
     }) => <div data-testid="motion-div">{children}</div>,
   },
-  AnimatePresence: ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 describe("KeyboardShortcutsOverlay", () => {
@@ -24,12 +22,7 @@ describe("KeyboardShortcutsOverlay", () => {
     const { default: KeyboardShortcutsOverlay } = await import(
       "@/components/KeyboardShortcutsOverlay"
     );
-    render(
-      <KeyboardShortcutsOverlay
-        isOpen={true}
-        onClose={() => {}}
-      />
-    );
+    render(<KeyboardShortcutsOverlay isOpen={true} onClose={() => {}} />);
 
     // The close button (native <button> with X icon) must have an accessible name
     const closeButton = screen.getByLabelText("Close keyboard shortcuts");

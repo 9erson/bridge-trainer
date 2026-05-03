@@ -42,14 +42,16 @@ Games are self-contained modules that register themselves via side-effect import
 3. **ResultsComponent** — Post-session results/stats display
 
 Registration pattern (in each game's `index.tsx`):
+
 ```ts
 registerGame({ config, SetupComponent, PlayComponent, ResultsComponent });
 ```
 
 Game modules are imported in `App.tsx` for side effects:
+
 ```ts
-import './games/pointCounting/index';
-import './games/openingBid/index';
+import "./games/pointCounting/index";
+import "./games/openingBid/index";
 ```
 
 The flow is: `GamePage.tsx` → loads module by URL param → orchestrates setup → play → results phases.

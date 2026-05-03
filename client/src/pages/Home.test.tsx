@@ -18,11 +18,9 @@ vi.mock("framer-motion", () => ({
       [key: string]: unknown;
     }) => <div data-testid="motion-div">{children}</div>,
   },
-  AnimatePresence: ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 // Mock wouter's useLocation for Home page
