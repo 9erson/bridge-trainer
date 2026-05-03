@@ -151,9 +151,9 @@ export default function History() {
                   <Line
                     type="monotone"
                     dataKey="accuracy"
-                    stroke="oklch(0.35 0.08 165)"
+                    stroke="var(--chart-1)"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: 'oklch(0.35 0.08 165)' }}
+                    dot={{ r: 3, fill: 'var(--chart-1)' }}
                   />
                 </LineChart>
               </ResponsiveContainer>

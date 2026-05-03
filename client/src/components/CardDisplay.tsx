@@ -75,7 +75,7 @@ function MiniCard({ suit, rank }: { suit: Suit; rank: string }) {
 
   return (
     <div
-      className="relative w-10 h-14 rounded-md border border-border/60 bg-white shadow-sm
+      className="relative w-10 h-14 rounded-md border border-border/60 bg-card shadow-sm
                  flex flex-col items-center justify-center select-none
                  hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
       style={{ fontFamily: "'DM Sans', sans-serif" }}

@@ -82,7 +82,7 @@ export default function OpeningBidResults({ results, onPlayAgain, onBackToMenu }
             <CardContent className="space-y-4">
               {mistakes.map((m, i) => {
                 const userFormatted = m.userAnswer === '__timeout__'
-                  ? { text: "Time's up", color: '#888' }
+                  ? { text: "Time's up", color: 'var(--muted-foreground)' }
                   : formatBid(m.userAnswer);
                 const correctFormatted = formatBid(m.correctAnswer);
                 const handData = m.handData as BridgeHand & { seat?: string; vuln?: string };

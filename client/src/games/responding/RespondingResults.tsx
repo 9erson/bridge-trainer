@@ -115,7 +115,7 @@ export default function RespondingResults({
               const meta = getHandMeta(h.handData);
               const userFormatted =
                 h.userAnswer === "__timeout__"
-                  ? { text: "Time's up", color: "#888" }
+                  ? { text: "Time's up", color: "var(--muted-foreground)" }
                   : formatBid(h.userAnswer);
               const correctFormatted = formatBid(h.correctAnswer);
               const partnerFormatted = formatPartnerBid(meta.partnerBid);
