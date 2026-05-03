@@ -11,18 +11,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import CardDisplay from "@/components/CardDisplay";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
 import GameShell from "@/components/GameShell";
+import { calculateHCP } from "@/lib/bridge";
+import { getBidsForDifficulty, formatBid } from "@/lib/conventions";
 import {
-  generateRandomHand,
-  calculateHCP,
-  type BridgeHand,
-  type SeatPosition,
-  type Vulnerability,
-} from "@/lib/bridge";
-import {
-  getCorrectBid,
-  getBidsForDifficulty,
-  formatBid,
-} from "@/lib/conventions";
+  generateHandForBidding,
+  type HandGenerationResult,
+} from "@/lib/handGeneration";
 import { nanoid } from "nanoid";
 import { saveSession, saveHandResult } from "@/lib/db";
 import type {
@@ -39,52 +33,6 @@ interface Props {
   settings: GameSettings;
   onComplete: (results: GameResults) => void;
   onQuit: () => void;
-}
-
-const SEATS: SeatPosition[] = ["1st", "2nd", "3rd", "4th"];
-const VULNS: Vulnerability[] = ["none", "ns", "ew", "both"];
-
-function getRandomSeat(difficulty: string): SeatPosition {
-  if (difficulty === "easy") return "1st";
-  return SEATS[Math.floor(Math.random() * SEATS.length)];
-}
-
-function getRandomVuln(difficulty: string): Vulnerability {
-  if (difficulty === "easy" || difficulty === "medium") return "none";
-  return VULNS[Math.floor(Math.random() * VULNS.length)];
-}
-
-function generateHandForBidding(
-  conventionId: string,
-  difficulty: string,
-  availableBids: string[]
-): {
-  hand: BridgeHand;
-  bid: string;
-  description: string;
-  seat: SeatPosition;
-  vuln: Vulnerability;
-} {
-  const seat = getRandomSeat(difficulty);
-  const vuln = getRandomVuln(difficulty);
-
-  for (let i = 0; i < 200; i++) {
-    const hand = generateRandomHand();
-    const result = getCorrectBid(hand, conventionId, seat, vuln);
-    if (result && availableBids.includes(result.bid)) {
-      return {
-        hand,
-        bid: result.bid,
-        description: result.description,
-        seat,
-        vuln,
-      };
-    }
-  }
-
-  const hand = generateRandomHand();
-  const result = getCorrectBid(hand, conventionId, seat, vuln);
-  return { hand, bid: result.bid, description: result.description, seat, vuln };
 }
 
 // Map a bid string to its keyboard shortcut key sequence
@@ -113,9 +61,8 @@ export default function OpeningBidPlay({
   const handStartTime = useRef(Date.now());
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [handData, setHandData] = useState(() =>
-    generateHandForBidding(conventionId, settings.difficulty, availableBids)
-  );
+  const [handData, setHandData] = useState<HandGenerationResult | null>(null);
+  const [isGenerating, setIsGenerating] = useState(true);
   const [displayMode, setDisplayMode] = useState(settings.displayMode);
   const [results, setResults] = useState<HandResultData[]>([]);
   const [feedback, setFeedback] = useState<{
@@ -125,30 +72,56 @@ export default function OpeningBidPlay({
     description: string;
   } | null>(null);
   const [timerKey, setTimerKey] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showReference, setShowReference] = useState(false);
   const [sequenceBuffer, setSequenceBuffer] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const sequenceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const generateNewHand = useCallback(() => {
-    const newData = generateHandForBidding(
-      conventionId,
-      settings.difficulty,
-      availableBids
-    );
-    setHandData(newData);
-    setFeedback(null);
-    setSelectedIndex(0);
-    handStartTime.current = Date.now();
-    setTimerKey(k => k + 1);
-    setIsTimerRunning(true);
+  // Generate initial hand on mount
+  useEffect(() => {
+    let cancelled = false;
+    generateHandForBidding(conventionId, settings.difficulty, availableBids)
+      .then(data => {
+        if (!cancelled) {
+          setHandData(data);
+          setIsGenerating(false);
+          setIsTimerRunning(true);
+          handStartTime.current = Date.now();
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setIsGenerating(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const generateNewHand = useCallback(async () => {
+    setIsGenerating(true);
+    setIsTimerRunning(false);
+    try {
+      const newData = await generateHandForBidding(
+        conventionId,
+        settings.difficulty,
+        availableBids
+      );
+      setHandData(newData);
+      setFeedback(null);
+      setSelectedIndex(0);
+      handStartTime.current = Date.now();
+      setTimerKey(k => k + 1);
+      setIsTimerRunning(true);
+    } finally {
+      setIsGenerating(false);
+    }
   }, [conventionId, settings.difficulty, availableBids]);
 
   const submitAnswer = useCallback(
     (userBid: string) => {
-      if (feedback) return;
+      if (feedback || isGenerating || !handData) return;
 
       const timeTaken = Date.now() - handStartTime.current;
       const isCorrect = userBid === handData.bid;
@@ -194,7 +167,14 @@ export default function OpeningBidPlay({
         proceedToNext(newResults);
       }
     },
-    [feedback, handData, currentIndex, results, settings.feedbackMode]
+    [
+      feedback,
+      isGenerating,
+      handData,
+      currentIndex,
+      results,
+      settings.feedbackMode,
+    ]
   );
 
   const proceedToNext = useCallback(
@@ -385,7 +365,7 @@ export default function OpeningBidPlay({
     handleNext,
   ]);
 
-  const hcp = calculateHCP(handData.hand);
+  const hcp = handData ? calculateHCP(handData.hand) : 0;
 
   return (
     <GameShell
@@ -399,151 +379,164 @@ export default function OpeningBidPlay({
     >
       <Card className="border-border/50 shadow-sm">
         <CardContent className="pt-6 pb-6">
-          {/* Header info */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              {settings.difficulty !== "easy" && (
-                <>
-                  <span className="bg-muted px-2 py-0.5 rounded font-medium">
-                    Seat: {handData.seat}
-                  </span>
-                  {settings.difficulty === "hard" && (
-                    <span className="bg-muted px-2 py-0.5 rounded font-medium">
-                      Vuln:{" "}
-                      {handData.vuln === "none"
-                        ? "None"
-                        : handData.vuln.toUpperCase()}
-                    </span>
-                  )}
-                </>
-              )}
-              <span className="bg-muted px-2 py-0.5 rounded font-mono font-medium">
-                {hcp} HCP
+          {isGenerating || !handData ? (
+            <div className="flex justify-center py-12">
+              <span className="text-sm text-muted-foreground animate-pulse">
+                Dealing cards…
               </span>
             </div>
-            <DisplayModeToggle mode={displayMode} onChange={setDisplayMode} />
-          </div>
-
-          {/* Hand display */}
-          <div className="flex justify-center mb-6">
-            <CardDisplay hand={handData.hand} mode={displayMode} />
-          </div>
-
-          {/* Question */}
-          <p className="text-center text-sm text-muted-foreground mb-4 font-serif">
-            What is your opening bid?
-          </p>
-
-          {/* Sequence indicator */}
-          {sequenceBuffer && (
-            <div className="text-center mb-2">
-              <span className="inline-flex items-center px-2 py-0.5 bg-primary/10 border border-primary/30 rounded text-xs font-mono text-primary">
-                {sequenceBuffer}_{" "}
-                <span className="ml-1 text-muted-foreground">
-                  (type C/D/H/S/N)
-                </span>
-              </span>
-            </div>
-          )}
-
-          {/* Bid selection */}
-          <AnimatePresence mode="wait">
-            {!feedback ? (
-              <motion.div
-                key="bids"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <div
-                  ref={containerRef}
-                  tabIndex={0}
-                  className="flex flex-wrap justify-center gap-2 max-w-md mx-auto outline-none"
-                >
-                  {availableBids.map((bid, idx) => {
-                    const formatted = formatBid(bid);
-                    const shortcutLabel = getBidShortcutLabel(bid);
-                    return (
-                      <Button
-                        key={bid}
-                        variant="outline"
-                        className={`h-11 px-3 font-semibold text-sm min-w-[3.5rem] relative transition-all ${
-                          selectedIndex === idx
-                            ? "ring-2 ring-primary ring-offset-1 bg-primary/5"
-                            : ""
-                        }`}
-                        onClick={() => submitAnswer(bid)}
-                      >
-                        <span style={{ color: formatted.color }}>
-                          {formatted.text}
+          ) : (
+            <>
+              {/* Header info */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  {settings.difficulty !== "easy" && (
+                    <>
+                      <span className="bg-muted px-2 py-0.5 rounded font-medium">
+                        Seat: {handData.seat}
+                      </span>
+                      {settings.difficulty === "hard" && (
+                        <span className="bg-muted px-2 py-0.5 rounded font-medium">
+                          Vuln:{" "}
+                          {handData.vuln === "none"
+                            ? "None"
+                            : handData.vuln.toUpperCase()}
                         </span>
-                        {shortcutLabel && (
-                          <span className="absolute -top-0.5 -right-0.5 text-[8px] bg-muted text-muted-foreground/70 px-1 rounded font-mono leading-tight">
-                            {shortcutLabel}
-                          </span>
-                        )}
-                      </Button>
-                    );
-                  })}
+                      )}
+                    </>
+                  )}
+                  <span className="bg-muted px-2 py-0.5 rounded font-mono font-medium">
+                    {hcp} HCP
+                  </span>
                 </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="feedback"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center space-y-3"
-              >
-                <div
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                <DisplayModeToggle
+                  mode={displayMode}
+                  onChange={setDisplayMode}
+                />
+              </div>
+
+              {/* Hand display */}
+              <div className="flex justify-center mb-6">
+                <CardDisplay hand={handData.hand} mode={displayMode} />
+              </div>
+
+              {/* Question */}
+              <p className="text-center text-sm text-muted-foreground mb-4 font-serif">
+                What is your opening bid?
+              </p>
+
+              {/* Sequence indicator */}
+              {sequenceBuffer && (
+                <div className="text-center mb-2">
+                  <span className="inline-flex items-center px-2 py-0.5 bg-primary/10 border border-primary/30 rounded text-xs font-mono text-primary">
+                    {sequenceBuffer}_{" "}
+                    <span className="ml-1 text-muted-foreground">
+                      (type C/D/H/S/N)
+                    </span>
+                  </span>
+                </div>
+              )}
+
+              {/* Bid selection */}
+              <AnimatePresence mode="wait">
+                {!feedback ? (
+                  <motion.div
+                    key="bids"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div
+                      ref={containerRef}
+                      tabIndex={0}
+                      className="flex flex-wrap justify-center gap-2 max-w-md mx-auto outline-none"
+                    >
+                      {availableBids.map((bid, idx) => {
+                        const formatted = formatBid(bid);
+                        const shortcutLabel = getBidShortcutLabel(bid);
+                        return (
+                          <Button
+                            key={bid}
+                            variant="outline"
+                            className={`h-11 px-3 font-semibold text-sm min-w-[3.5rem] relative transition-all ${
+                              selectedIndex === idx
+                                ? "ring-2 ring-primary ring-offset-1 bg-primary/5"
+                                : ""
+                            }`}
+                            onClick={() => submitAnswer(bid)}
+                          >
+                            <span style={{ color: formatted.color }}>
+                              {formatted.text}
+                            </span>
+                            {shortcutLabel && (
+                              <span className="absolute -top-0.5 -right-0.5 text-[8px] bg-muted text-muted-foreground/70 px-1 rounded font-mono leading-tight">
+                                {shortcutLabel}
+                              </span>
+                            )}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="feedback"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center space-y-3"
+                  >
+                    <div
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
                     ${
                       feedback.isCorrect
                         ? "bg-primary/10 text-primary border border-primary/30"
                         : "bg-destructive/10 text-destructive border border-destructive/30"
                     }`}
-                >
-                  {feedback.isCorrect ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Correct! {formatBid(feedback.correctBid).text}
-                    </>
-                  ) : (
-                    <>
-                      <X className="w-4 h-4" />
-                      {feedback.userBid === "__timeout__"
-                        ? "Time's up!"
-                        : `You said ${formatBid(feedback.userBid).text}`}{" "}
-                      — correct: {formatBid(feedback.correctBid).text}
-                    </>
-                  )}
-                </div>
-                {/* Explanation */}
-                <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3 max-w-sm mx-auto">
-                  <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                  <span className="font-serif">{feedback.description}</span>
-                </div>
-                <div>
-                  <Button onClick={handleNext} variant="default" size="sm">
-                    {currentIndex + 1 >= settings.handCount
-                      ? "See Results"
-                      : "Next Hand"}
-                    <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </div>
-                <p className="text-[10px] text-muted-foreground">
-                  Press{" "}
-                  <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">
-                    Enter
-                  </kbd>{" "}
-                  or{" "}
-                  <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">
-                    Space
-                  </kbd>{" "}
-                  to continue
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    >
+                      {feedback.isCorrect ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Correct! {formatBid(feedback.correctBid).text}
+                        </>
+                      ) : (
+                        <>
+                          <X className="w-4 h-4" />
+                          {feedback.userBid === "__timeout__"
+                            ? "Time's up!"
+                            : `You said ${formatBid(feedback.userBid).text}`}{" "}
+                          — correct: {formatBid(feedback.correctBid).text}
+                        </>
+                      )}
+                    </div>
+                    {/* Explanation */}
+                    <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3 max-w-sm mx-auto">
+                      <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                      <span className="font-serif">{feedback.description}</span>
+                    </div>
+                    <div>
+                      <Button onClick={handleNext} variant="default" size="sm">
+                        {currentIndex + 1 >= settings.handCount
+                          ? "See Results"
+                          : "Next Hand"}
+                        <ArrowRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Press{" "}
+                      <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">
+                        Enter
+                      </kbd>{" "}
+                      or{" "}
+                      <kbd className="px-1 py-0.5 bg-muted border border-border rounded text-[9px] font-mono">
+                        Space
+                      </kbd>{" "}
+                      to continue
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
         </CardContent>
       </Card>
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import OpeningBidPlay from "./OpeningBidPlay";
 import type { GameSettings } from "@/lib/gameRegistry";
 
@@ -53,6 +53,40 @@ vi.mock("@/components/GameShell", () => ({
   }) => <div data-testid="game-shell">{children}</div>,
 }));
 
+// Mock the async hand generation module
+vi.mock("@/lib/handGeneration", () => ({
+  generateHandForBidding: vi.fn(() =>
+    Promise.resolve({
+      hand: {
+        cards: [
+          { suit: "S", rank: "A" },
+          { suit: "S", rank: "K" },
+          { suit: "S", rank: "Q" },
+          { suit: "S", rank: "J" },
+          { suit: "S", rank: "T" },
+          { suit: "H", rank: "9" },
+          { suit: "H", rank: "8" },
+          { suit: "H", rank: "7" },
+          { suit: "D", rank: "6" },
+          { suit: "D", rank: "5" },
+          { suit: "D", rank: "4" },
+          { suit: "C", rank: "3" },
+          { suit: "C", rank: "2" },
+        ],
+      },
+      bid: "1NT",
+      description: "15-17 HCP, balanced hand",
+      seat: "1st" as const,
+      vuln: "none" as const,
+    })
+  ),
+}));
+
+// Mock the scheduler so we don't actually yield in tests
+vi.mock("@/lib/scheduler", () => ({
+  yieldToMainThread: () => Promise.resolve(),
+}));
+
 function makeSettings(
   overrides?: Partial<GameSettings["extra"]>
 ): GameSettings {
@@ -68,7 +102,7 @@ function makeSettings(
 }
 
 describe("OpeningBidPlay — touch targets (WCAG 2.5.8)", () => {
-  it("bid buttons have h-11 (44px) height to meet WCAG minimum touch target", () => {
+  it("bid buttons have h-11 (44px) height to meet WCAG minimum touch target", async () => {
     const settings = makeSettings();
     render(
       <OpeningBidPlay
@@ -78,14 +112,17 @@ describe("OpeningBidPlay — touch targets (WCAG 2.5.8)", () => {
       />
     );
 
-    // Find bid buttons — they contain formatted bid text (1♣, 1♦, etc.)
-    const bidButtons = screen.getAllByRole("button").filter(btn =>
-      // Bid buttons have the h- class for height and min-w-[3.5rem]
-      btn.className.includes("min-w-[3.5rem]")
-    );
+    // Wait for async hand generation to complete and bid buttons to appear
+    await waitFor(() => {
+      const bidButtons = screen
+        .getAllByRole("button")
+        .filter(btn => btn.className.includes("min-w-[3.5rem]"));
+      expect(bidButtons.length).toBeGreaterThan(0);
+    });
 
-    // There should be bid buttons visible (Pass + at least level-1 bids for easy)
-    expect(bidButtons.length).toBeGreaterThan(0);
+    const bidButtons = screen
+      .getAllByRole("button")
+      .filter(btn => btn.className.includes("min-w-[3.5rem]"));
 
     // WCAG 2.5.8: every bid button must have h-11 (44px) touch target
     bidButtons.forEach(btn => {
@@ -122,5 +159,50 @@ describe("OpeningBidPlay — feedback badge theme tokens (#32)", () => {
     expect(source).toContain("bg-destructive/10");
     expect(source).toContain("text-destructive");
     expect(source).toContain("border-destructive/30");
+  });
+});
+
+describe("OpeningBidPlay — async hand generation (#40)", () => {
+  it("uses the extracted async generateHandForBidding from handGeneration module", async () => {
+    const settings = makeSettings();
+    render(
+      <OpeningBidPlay
+        settings={settings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    // The component should import and call generateHandForBidding
+    // from @/lib/handGeneration rather than using an inline function
+    const { generateHandForBidding } = await import("@/lib/handGeneration");
+    await waitFor(() => {
+      expect(generateHandForBidding).toHaveBeenCalled();
+    });
+  });
+
+  it("renders bid buttons after async hand loads", async () => {
+    const settings = makeSettings();
+    render(
+      <OpeningBidPlay
+        settings={settings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    // After the async hand generation resolves, bid buttons should appear
+    await waitFor(() => {
+      const bidButtons = screen
+        .getAllByRole("button")
+        .filter(btn => btn.className.includes("min-w-[3.5rem]"));
+      expect(bidButtons.length).toBeGreaterThan(0);
+    });
+  });
+
+  it("source no longer contains inline generateHandForBidding function", () => {
+    // The old synchronous inline function should be removed
+    // (it's now imported from @/lib/handGeneration)
+    expect(source).not.toContain("function generateHandForBidding(");
   });
 });
