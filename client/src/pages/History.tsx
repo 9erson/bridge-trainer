@@ -3,7 +3,7 @@
 // Card Table Modernist theme
 // ============================================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,13 @@ const GAME_NAMES: Record<string, string> = {
   "point-counting": "Point Counting",
   "opening-bid": "Opening Bid",
 };
+
+// Stable icon references — prevents StatCard from re-rendering when
+// the parent re-renders (inline JSX creates new React elements each time)
+const TROPHY_ICON = <Trophy className="w-4 h-4" />;
+const TARGET_ICON = <Target className="w-4 h-4" />;
+const CLOCK_ICON = <Clock className="w-4 h-4" />;
+const TRENDING_UP_ICON = <TrendingUp className="w-4 h-4" />;
 
 export default function History() {
   const [sessions, setSessions] = useState<GameSession[]>([]);
@@ -89,22 +96,22 @@ export default function History() {
       {stats && stats.totalSessions > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard
-            icon={<Trophy className="w-4 h-4" />}
+            icon={TROPHY_ICON}
             label="Sessions"
             value={String(stats.totalSessions)}
           />
           <StatCard
-            icon={<Target className="w-4 h-4" />}
+            icon={TARGET_ICON}
             label="Avg Accuracy"
             value={`${Math.round(stats.avgAccuracy * 100)}%`}
           />
           <StatCard
-            icon={<Clock className="w-4 h-4" />}
+            icon={CLOCK_ICON}
             label="Avg Time"
             value={`${(stats.avgTime / 1000).toFixed(1)}s`}
           />
           <StatCard
-            icon={<TrendingUp className="w-4 h-4" />}
+            icon={TRENDING_UP_ICON}
             label="Best Accuracy"
             value={`${Math.round(stats.bestAccuracy * 100)}%`}
           />
@@ -181,7 +188,7 @@ export default function History() {
   );
 }
 
-function StatCard({
+const StatCard = memo(function StatCard({
   icon,
   label,
   value,
@@ -201,9 +208,9 @@ function StatCard({
       </CardContent>
     </Card>
   );
-}
+});
 
-function SessionRow({
+const SessionRow = memo(function SessionRow({
   session,
   onDelete,
 }: {
@@ -252,4 +259,4 @@ function SessionRow({
       </Button>
     </div>
   );
-}
+});

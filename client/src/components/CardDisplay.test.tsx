@@ -210,4 +210,60 @@ describe("CardDisplay", () => {
       });
     });
   });
+
+  describe("React.memo optimization (#18)", () => {
+    it("CardDisplay is wrapped in React.memo (type check)", () => {
+      // React.memo components have a $$typeof of Symbol(react.memo)
+      // and their .type property is the inner function
+      expect(typeof CardDisplay).toBe("object");
+      expect(CardDisplay.$$typeof).toBeTruthy();
+    });
+
+    it("CardDisplay preserves DOM nodes when parent re-renders with identical props", () => {
+      const { container, rerender } = render(
+        <CardDisplay hand={graphicHand} mode="graphic" />
+      );
+
+      const miniCardsBefore = container.querySelectorAll(".mini-card");
+      expect(miniCardsBefore.length).toBe(4);
+
+      // Force re-render with the same hand and mode references
+      rerender(<CardDisplay hand={graphicHand} mode="graphic" />);
+
+      const miniCardsAfter = container.querySelectorAll(".mini-card");
+      expect(miniCardsAfter.length).toBe(4);
+
+      // DOM nodes should be the exact same objects (not recreated)
+      for (let i = 0; i < miniCardsBefore.length; i++) {
+        expect(miniCardsBefore[i]).toBe(miniCardsAfter[i]);
+      }
+    });
+
+    it("CardDisplay re-renders when hand prop changes", () => {
+      const { container, rerender } = render(
+        <CardDisplay hand={graphicHand} mode="graphic" />
+      );
+
+      expect(container.querySelectorAll(".mini-card").length).toBe(4);
+
+      const newHand: BridgeHand = {
+        cards: [{ suit: "H", rank: "7" }],
+      };
+      rerender(<CardDisplay hand={newHand} mode="graphic" />);
+
+      expect(container.querySelectorAll(".mini-card").length).toBe(1);
+    });
+
+    it("CardDisplay re-renders when mode prop changes", () => {
+      const { container, rerender } = render(
+        <CardDisplay hand={graphicHand} mode="text" />
+      );
+
+      expect(container.querySelectorAll(".mini-card").length).toBe(0);
+
+      rerender(<CardDisplay hand={graphicHand} mode="graphic" />);
+
+      expect(container.querySelectorAll(".mini-card").length).toBe(4);
+    });
+  });
 });

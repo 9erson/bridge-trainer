@@ -44,4 +44,54 @@ describe("DisplayModeToggle", () => {
 
     expect(onChange).toHaveBeenCalledWith("graphic");
   });
+
+  describe("React.memo optimization (#18)", () => {
+    it("DisplayModeToggle is wrapped in React.memo (type check)", () => {
+      // React.memo components are objects with $$typeof
+      expect(typeof DisplayModeToggle).toBe("object");
+      expect(DisplayModeToggle.$$typeof).toBeTruthy();
+    });
+
+    it("DisplayModeToggle preserves DOM nodes when re-rendered with identical props", () => {
+      const stableOnChange = vi.fn();
+      const { container, rerender } = render(
+        <DisplayModeToggle mode="text" onChange={stableOnChange} />
+      );
+
+      const buttonsBefore = container.querySelectorAll("button");
+      expect(buttonsBefore.length).toBe(2);
+
+      // Re-render with same props
+      rerender(
+        <DisplayModeToggle mode="text" onChange={stableOnChange} />
+      );
+
+      const buttonsAfter = container.querySelectorAll("button");
+      expect(buttonsAfter.length).toBe(2);
+
+      // DOM nodes should be the same objects
+      for (let i = 0; i < buttonsBefore.length; i++) {
+        expect(buttonsBefore[i]).toBe(buttonsAfter[i]);
+      }
+    });
+
+    it("DisplayModeToggle re-renders when mode prop changes", () => {
+      const onChange = vi.fn();
+      const { container, rerender } = render(
+        <DisplayModeToggle mode="text" onChange={onChange} />
+      );
+
+      // Text button should have default variant styling
+      const textButton = screen.getByRole("button", { name: /text/i });
+      expect(textButton.className).toContain("h-11");
+
+      rerender(
+        <DisplayModeToggle mode="graphic" onChange={onChange} />
+      );
+
+      // Cards button should now be active
+      const cardsButton = screen.getByRole("button", { name: /cards/i });
+      expect(cardsButton.className).toContain("h-11");
+    });
+  });
 });

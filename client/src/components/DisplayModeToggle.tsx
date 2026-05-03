@@ -2,6 +2,7 @@
 // DisplayModeToggle — switch between text and graphic card views
 // ============================================================
 
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Eye, Type } from "lucide-react";
 
@@ -10,7 +11,7 @@ interface DisplayModeToggleProps {
   onChange: (mode: "text" | "graphic") => void;
 }
 
-export default function DisplayModeToggle({
+export default memo(function DisplayModeToggle({
   mode,
   onChange,
 }: DisplayModeToggleProps) {
@@ -36,4 +37,4 @@ export default function DisplayModeToggle({
       </Button>
     </div>
   );
-}
+});

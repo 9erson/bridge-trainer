@@ -15,6 +15,7 @@ import {
   getCardsInSuit,
   getRankDisplay,
 } from "@/lib/bridge";
+import { memo } from "react";
 import { motion } from "framer-motion";
 
 // Rank-to-name mapping for screen reader announcements
@@ -56,7 +57,7 @@ interface CardDisplayProps {
   mode: "text" | "graphic";
 }
 
-export default function CardDisplay({ hand, mode }: CardDisplayProps) {
+export default memo(function CardDisplay({ hand, mode }: CardDisplayProps) {
   const display =
     mode === "text" ? (
       <TextDisplay hand={hand} />
@@ -70,9 +71,9 @@ export default function CardDisplay({ hand, mode }: CardDisplayProps) {
       <div aria-hidden="true">{display}</div>
     </div>
   );
-}
+});
 
-function TextDisplay({ hand }: { hand: BridgeHand }) {
+const TextDisplay = memo(function TextDisplay({ hand }: { hand: BridgeHand }) {
   return (
     <div className="space-y-2">
       {SUITS.map(suit => {
@@ -95,9 +96,13 @@ function TextDisplay({ hand }: { hand: BridgeHand }) {
       })}
     </div>
   );
-}
+});
 
-function GraphicDisplay({ hand }: { hand: BridgeHand }) {
+const GraphicDisplay = memo(function GraphicDisplay({
+  hand,
+}: {
+  hand: BridgeHand;
+}) {
   return (
     <div className="space-y-3">
       {SUITS.map(suit => {
@@ -129,9 +134,9 @@ function GraphicDisplay({ hand }: { hand: BridgeHand }) {
       })}
     </div>
   );
-}
+});
 
-function MiniCard({
+const MiniCard = memo(function MiniCard({
   suit,
   rank,
   ariaLabel,
@@ -160,4 +165,4 @@ function MiniCard({
       </span>
     </div>
   );
-}
+});

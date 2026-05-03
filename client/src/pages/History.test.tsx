@@ -199,3 +199,26 @@ describe("History — query optimization (#39)", () => {
     expect(historySource).not.toContain("getCompletedSessionStats");
   });
 });
+
+describe("History — React.memo optimization (#18)", () => {
+  it("StatCard and SessionRow use stable icon references (module-level constants)", () => {
+    // Verify that the icon constants are extracted to module level
+    // instead of being created inline on each render
+    expect(historySource).toContain("TROPHY_ICON");
+    expect(historySource).toContain("TARGET_ICON");
+    expect(historySource).toContain("CLOCK_ICON");
+    expect(historySource).toContain("TRENDING_UP_ICON");
+  });
+
+  it("StatCard is wrapped in React.memo", () => {
+    expect(historySource).toMatch(
+      /const StatCard = memo\(function StatCard/
+    );
+  });
+
+  it("SessionRow is wrapped in React.memo", () => {
+    expect(historySource).toMatch(
+      /const SessionRow = memo\(function SessionRow/
+    );
+  });
+});
