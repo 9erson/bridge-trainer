@@ -1,5 +1,7 @@
 // ============================================================
 // Timer — countdown timer with visual progress bar
+// Updates React state once per second (not 10x/sec) to
+// avoid unnecessary re-renders through the game component tree.
 // ============================================================
 
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -27,19 +29,26 @@ export default function Timer({ seconds, isRunning, onTimeUp }: TimerProps) {
   useEffect(() => {
     if (!isRunning) return;
 
+    // Use wall-clock time to avoid drift from accumulated tick errors.
+    // The interval fires once per second, and setState only triggers
+    // when the displayed second actually changes.
+    const endMs = Date.now() + remaining;
+
     const interval = setInterval(() => {
-      setRemaining(prev => {
-        const next = prev - 100;
-        if (next <= 0) {
-          clearInterval(interval);
-          onTimeUpRef.current();
-          return 0;
-        }
-        return next;
-      });
-    }, 100);
+      const now = Date.now();
+      const newRemaining = Math.max(0, endMs - now);
+
+      if (newRemaining <= 0) {
+        clearInterval(interval);
+        setRemaining(0);
+        onTimeUpRef.current();
+      } else {
+        setRemaining(newRemaining);
+      }
+    }, 1000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRunning]);
 
   const progress = (remaining / (seconds * 1000)) * 100;
