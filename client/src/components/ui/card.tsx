@@ -28,15 +28,28 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-title"
-      className={cn("leading-none font-semibold", className)}
-      {...props}
-    />
-  );
-}
+type HeadingElement = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+
+type CardTitleProps = {
+  /** Polymorphic heading element. Defaults to "h3" for semantic accessibility. */
+  as?: HeadingElement;
+} & Omit<React.ComponentProps<"h3">, "as">;
+
+// Renders a semantic heading (<h3> by default) for screen reader navigation.
+// Use the `as` prop to change the heading level when a different hierarchy is needed.
+const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
+  ({ as: Tag = "h3", className, ...props }, ref) => {
+    return (
+      <Tag
+        ref={ref}
+        data-slot="card-title"
+        className={cn("leading-none font-semibold", className)}
+        {...props}
+      />
+    );
+  }
+);
+CardTitle.displayName = "CardTitle";
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
