@@ -11,9 +11,12 @@ import { motion } from 'framer-motion';
 
 const HERO_IMAGE = '/manus-storage/hero-banner_bc20a37b.png';
 
+// The game registry is static after module-load — hoist to module scope
+// so we don't allocate a new array on every Home render.
+const games = getAllGames();
+
 export default function Home() {
   const [, navigate] = useLocation();
-  const games = getAllGames();
 
   return (
     <div className="space-y-8">

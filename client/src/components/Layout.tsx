@@ -11,6 +11,10 @@ import { Spade, History, Menu, X, ChevronRight, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// The game registry is static after module-load — hoist to module scope
+// so we don't allocate a new array on every Layout render.
+const games = getAllGames();
+
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -18,7 +22,6 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const games = getAllGames();
 
   const navItems = [
     { path: '/', label: 'Games', icon: <Spade className="w-4 h-4" /> },
