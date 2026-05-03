@@ -63,10 +63,10 @@ export const SUIT_NAMES: Record<Suit, string> = {
 };
 
 export const SUIT_COLORS: Record<Suit, string> = {
-  S: "#1a1a2e",
-  H: "#c0392b",
-  D: "#c0392b",
-  C: "#1a1a2e",
+  S: "var(--suit-black)",
+  H: "var(--suit-red)",
+  D: "var(--suit-red)",
+  C: "var(--suit-black)",
 };
 
 export const HCP_VALUES: Partial<Record<Rank, number>> = {

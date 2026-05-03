@@ -310,13 +310,16 @@ const SUIT_BID_SYMBOLS: Record<string, string> = {
 };
 
 export function formatBid(bid: string): { text: string; color: string } {
-  if (bid === "Pass") return { text: "Pass", color: "#16a34a" };
-  if (bid.endsWith("NT")) return { text: bid, color: "#1a1a2e" };
+  if (bid === "Pass") return { text: "Pass", color: "var(--bid-pass)" };
+  if (bid.endsWith("NT")) return { text: bid, color: "var(--suit-black)" };
 
   const level = bid[0];
   const suitChar = bid[1];
   const symbol = SUIT_BID_SYMBOLS[suitChar];
-  const color = suitChar === "H" || suitChar === "D" ? "#c0392b" : "#1a1a2e";
+  const color =
+    suitChar === "H" || suitChar === "D"
+      ? "var(--suit-red)"
+      : "var(--suit-black)";
 
   return { text: `${level}${symbol}`, color };
 }

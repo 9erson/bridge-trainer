@@ -262,10 +262,10 @@ const conventions: ConventionRef[] = [
 
 function renderBid(bid: string): React.ReactNode {
   const colored = bid
-    .replace(/♠/g, '<span class="text-foreground">♠</span>')
-    .replace(/♥/g, '<span class="text-red-600">♥</span>')
-    .replace(/♦/g, '<span class="text-red-600">♦</span>')
-    .replace(/♣/g, '<span class="text-foreground">♣</span>');
+    .replace(/♠/g, '<span style="color:var(--suit-black)">♠</span>')
+    .replace(/♥/g, '<span style="color:var(--suit-red)">♥</span>')
+    .replace(/♦/g, '<span style="color:var(--suit-red)">♦</span>')
+    .replace(/♣/g, '<span style="color:var(--suit-black)">♣</span>');
   return (
     <span
       className="font-mono font-bold"
