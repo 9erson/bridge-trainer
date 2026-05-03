@@ -79,3 +79,12 @@ describe("PointCountingResults — theme tokens (#32)", () => {
     expect(source).toContain("text-primary");
   });
 });
+
+describe("PointCountingResults — responsive layout (#38)", () => {
+  it("stats grid uses responsive gap for narrow viewports", () => {
+    // Fixed gap-4 (16px) cramps the 3-column stats grid at 320px viewport.
+    // gap-2 sm:gap-4 uses tighter 8px gap on mobile, standard 16px on desktop.
+    expect(source).toContain("gap-2 sm:gap-4");
+    expect(source).not.toMatch(/grid-cols-3 gap-4(?! )/);
+  });
+});

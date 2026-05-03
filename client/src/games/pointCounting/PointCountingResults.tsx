@@ -55,7 +55,7 @@ export default function PointCountingResults({
             </div>
 
             {/* Stats grid */}
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">
                   Avg Time

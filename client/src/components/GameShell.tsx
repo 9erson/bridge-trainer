@@ -50,13 +50,13 @@ export default function GameShell({
     <div className="w-full max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <span className="font-mono text-sm font-semibold text-muted-foreground">
             {currentHand} / {totalHands}
           </span>
           <Progress
             value={(currentHand / totalHands) * 100}
-            className="w-32 h-1.5"
+            className="w-auto flex-1 h-1.5"
             aria-label="Practice session progress"
             getValueLabel={() => `Hand ${currentHand} of ${totalHands}`}
           />
