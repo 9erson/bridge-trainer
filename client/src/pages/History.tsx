@@ -237,6 +237,7 @@ function SessionRow({ session, onDelete }: { session: GameSession; onDelete: (id
         variant="ghost"
         size="sm"
         className="text-muted-foreground hover:text-destructive shrink-0"
+        aria-label="Delete session"
         onClick={() => onDelete(session.id)}
       >
         <Trash2 className="w-3.5 h-3.5" />

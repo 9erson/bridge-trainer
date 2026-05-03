@@ -1,6 +1,69 @@
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { render, screen, waitFor } from "@testing-library/react";
+import { Route, Switch } from "wouter";
+
+// We need to render SessionRow to test the delete button's aria-label.
+// Mock the db module so History doesn't try to open IndexedDB.
+const mockSession = {
+  id: "test-session-1",
+  gameType: "point-counting",
+  startedAt: Date.now(),
+  completedAt: Date.now(),
+  isComplete: true,
+  settings: "{}",
+  totalHands: 5,
+  correctCount: 4,
+  totalTime: 25000,
+  averageTime: 5000,
+  accuracy: 0.8,
+  extraData: "{}",
+};
+
+vi.mock("@/lib/db", () => ({
+  getAllSessions: () => Promise.resolve([mockSession]),
+  getCompletedSessionStats: () =>
+    Promise.resolve({
+      totalSessions: 1,
+      avgAccuracy: 0.8,
+      avgTime: 5000,
+      bestAccuracy: 0.8,
+      recentTrend: [],
+    }),
+  deleteSession: () => Promise.resolve(),
+}));
+
+// Mock framer-motion to avoid animation complexity in tests
+vi.mock("framer-motion", () => ({
+  motion: {
+    div: ({
+      children,
+      ...props
+    }: {
+      children: React.ReactNode;
+      [key: string]: unknown;
+    }) => <div data-testid="motion-div">{children}</div>,
+  },
+  AnimatePresence: ({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) => <>{children}</>,
+}));
+
+// Mock recharts — it requires non-zero container dimensions jsdom doesn't provide.
+vi.mock("recharts", () => ({
+  LineChart: () => null,
+  Line: () => null,
+  XAxis: () => null,
+  YAxis: () => null,
+  CartesianGrid: () => null,
+  Tooltip: () => null,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}));
 
 // Read the source file to verify no hard-coded color literals
 // This is more reliable than rendering Recharts in jsdom (which requires
@@ -21,5 +84,30 @@ describe("History", () => {
   it("uses var(--chart-1) for chart line stroke and dot fill", () => {
     expect(historySource).toContain('stroke="var(--chart-1)"');
     expect(historySource).toContain("fill: 'var(--chart-1)'");
+  });
+
+  it("delete session button has aria-label", async () => {
+    const { default: History } = await import("@/pages/History");
+    render(
+      <Switch>
+        <Route>{() => <History />}</Route>
+      </Switch>
+    );
+
+    // Wait for async data loading to complete — the session game name appears
+    await screen.findByText("Point Counting");
+
+    // Verify the delete button exists (it contains a Trash2 icon)
+    const deleteButtons = document.querySelectorAll<HTMLButtonElement>(
+      'button[data-slot="button"]'
+    );
+    // There should be at least one button in the session rows
+    const deleteButton = Array.from(deleteButtons).find(
+      (b) => b.querySelector("svg") !== null && b.textContent?.trim() === ""
+    );
+    expect(deleteButton).toBeDefined();
+
+    // The delete button must have an accessible name
+    expect(deleteButton!.getAttribute("aria-label")).toBe("Delete session");
   });
 });

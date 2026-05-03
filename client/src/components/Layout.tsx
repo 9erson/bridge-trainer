@@ -87,6 +87,8 @@ export default function Layout({ children }: LayoutProps) {
             variant="ghost"
             size="sm"
             className="text-sidebar-foreground hover:bg-sidebar-accent min-h-[44px] min-w-[44px]"
+            aria-label="Toggle sidebar"
+            aria-expanded={sidebarOpen}
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

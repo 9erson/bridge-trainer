@@ -94,6 +94,23 @@ describe("Layout", () => {
     expect(hasMinWidth44).toBe(true);
   });
 
+  it("hamburger button has aria-label and aria-expanded attributes", async () => {
+    const { default: Layout } = await import("@/components/Layout");
+    render(
+      <TestWrapper>
+        <Layout>Test content</Layout>
+      </TestWrapper>
+    );
+
+    // The mobile hamburger is the only <button> in the mobile header
+    const hamburger = document.querySelector<HTMLButtonElement>(
+      '[data-slot="button"]'
+    );
+    expect(hamburger).not.toBeNull();
+    expect(hamburger!.getAttribute("aria-label")).toBe("Toggle sidebar");
+    expect(hamburger!.getAttribute("aria-expanded")).toBe("false");
+  });
+
   it("does not call getAllGames on every render", async () => {
     const spy = vi.spyOn(gameRegistry, "getAllGames");
 
