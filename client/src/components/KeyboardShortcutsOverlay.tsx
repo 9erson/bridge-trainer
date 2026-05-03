@@ -1,11 +1,18 @@
 // ============================================================
 // KeyboardShortcutsOverlay — modal showing all available shortcuts
 // Triggered by pressing "?" anywhere in the app.
+// Built on shadcn Dialog (Radix) for full accessibility support.
 // ============================================================
 
-import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { X, Keyboard } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogOverlay,
+  DialogPortal,
+} from "@/components/ui/dialog";
 
 interface ShortcutGroup {
   title: string;
@@ -66,18 +73,6 @@ export default function KeyboardShortcutsOverlay({
   onClose,
   context,
 }: Props) {
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key === "?") {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen, onClose]);
-
   const groups: ShortcutGroup[] = [generalShortcuts];
   if (context === "point-counting") {
     groups.push(pointCountingShortcuts);
@@ -89,82 +84,74 @@ export default function KeyboardShortcutsOverlay({
   groups.push(resultsShortcuts);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={onClose}
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+      <DialogPortal>
+        <DialogOverlay className="backdrop-blur-sm" />
+        <DialogContent
+          showCloseButton={false}
+          aria-describedby={undefined}
+          className="rounded-xl max-h-[80vh] overflow-y-auto bg-card border-border shadow-xl"
+          onInteractOutside={e => e.preventDefault()}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-card border border-border rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <div className="flex items-center gap-2">
-                <Keyboard className="w-5 h-5 text-primary" />
-                <h2 className="font-semibold text-foreground">
-                  Keyboard Shortcuts
-                </h2>
-              </div>
-              <button
-                onClick={onClose}
-                aria-label="Close keyboard shortcuts"
-                className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <X className="w-4 h-4" />
-              </button>
+          {/* Header */}
+          <DialogHeader className="flex-row items-center justify-between space-y-0 border-b border-border p-4">
+            <div className="flex items-center gap-2">
+              <Keyboard className="w-5 h-5 text-primary" />
+              <DialogTitle className="font-semibold text-foreground">
+                Keyboard Shortcuts
+              </DialogTitle>
             </div>
+            <button
+              onClick={onClose}
+              aria-label="Close keyboard shortcuts"
+              className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </DialogHeader>
 
-            {/* Content */}
-            <div className="p-4 space-y-5">
-              {groups.map(group => (
-                <div key={group.title}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-                    {group.title}
-                  </h3>
-                  <div className="space-y-1.5">
-                    {group.shortcuts.map((shortcut, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span className="text-foreground/80">
-                          {shortcut.description}
-                        </span>
-                        <kbd className="ml-4 shrink-0 px-2 py-0.5 bg-muted border border-border rounded text-xs font-mono text-muted-foreground">
-                          {shortcut.keys}
-                        </kbd>
-                      </div>
-                    ))}
-                  </div>
+          {/* Content */}
+          <div className="p-4 pt-0 space-y-5">
+            {groups.map(group => (
+              <div key={group.title}>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                  {group.title}
+                </h3>
+                <div className="space-y-1.5">
+                  {group.shortcuts.map((shortcut, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="text-foreground/80">
+                        {shortcut.description}
+                      </span>
+                      <kbd className="ml-4 shrink-0 px-2 py-0.5 bg-muted border border-border rounded text-xs font-mono text-muted-foreground">
+                        {shortcut.keys}
+                      </kbd>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
 
-            {/* Footer */}
-            <div className="p-3 border-t border-border text-center">
-              <span className="text-xs text-muted-foreground">
-                Press{" "}
-                <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs font-mono">
-                  ?
-                </kbd>{" "}
-                or{" "}
-                <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs font-mono">
-                  Esc
-                </kbd>{" "}
-                to close
-              </span>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {/* Footer */}
+          <div className="p-3 border-t border-border text-center">
+            <span className="text-xs text-muted-foreground">
+              Press{" "}
+              <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs font-mono">
+                ?
+              </kbd>{" "}
+              or{" "}
+              <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs font-mono">
+                Esc
+              </kbd>{" "}
+              to close
+            </span>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 }
