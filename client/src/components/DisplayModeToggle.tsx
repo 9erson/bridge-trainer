@@ -15,11 +15,11 @@ export default function DisplayModeToggle({
   onChange,
 }: DisplayModeToggleProps) {
   return (
-    <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
+    <div className="flex items-center gap-1 bg-muted rounded-md p-1">
       <Button
         variant={mode === "text" ? "default" : "ghost"}
         size="sm"
-        className="h-7 px-2 text-xs"
+        className="h-11 px-2 text-xs"
         onClick={() => onChange("text")}
       >
         <Type className="w-3.5 h-3.5 mr-1" />
@@ -28,7 +28,7 @@ export default function DisplayModeToggle({
       <Button
         variant={mode === "graphic" ? "default" : "ghost"}
         size="sm"
-        className="h-7 px-2 text-xs"
+        className="h-11 px-2 text-xs"
         onClick={() => onChange("graphic")}
       >
         <Eye className="w-3.5 h-3.5 mr-1" />
