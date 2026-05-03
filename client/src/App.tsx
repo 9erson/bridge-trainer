@@ -19,6 +19,7 @@ import ConventionReference from './pages/ConventionReference';
 import './lib/conventionData';
 import './games/pointCounting/index';
 import './games/openingBid/index';
+import './games/responding/index';
 
 function Router() {
   return (
