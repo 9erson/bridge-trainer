@@ -206,3 +206,33 @@ describe("OpeningBidPlay — async hand generation (#40)", () => {
     expect(source).not.toContain("function generateHandForBidding(");
   });
 });
+
+describe("OpeningBidPlay — sequenceBuffer extraction (#21)", () => {
+  it("imports SequenceIndicator component instead of inline JSX", () => {
+    expect(source).toContain("SequenceIndicator");
+    expect(source).toContain(
+      'import SequenceIndicator from "@/components/SequenceIndicator"'
+    );
+  });
+
+  it("no longer has sequenceBuffer useState", () => {
+    expect(source).not.toContain('useState("")');
+    // The old sequenceBuffer state declaration should be gone
+    expect(source).not.toContain("sequenceBuffer, setSequenceBuffer");
+  });
+
+  it("no longer has sequenceTimeout ref", () => {
+    expect(source).not.toContain("sequenceTimeout");
+  });
+
+  it("no longer has inline sequence indicator JSX", () => {
+    // The old inline {sequenceBuffer && (...)} block should be removed
+    expect(source).not.toContain("type C/D/H/S/N");
+  });
+
+  it("no longer handles digit/strain keys in the keyboard effect", () => {
+    // The digit regex for starting sequences should only exist in SequenceIndicator now
+    expect(source).not.toContain("/^[1-7]$/");
+    expect(source).not.toContain("/^[cdhsn]$/");
+  });
+});

@@ -27,25 +27,13 @@ import type {
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, ArrowRight, Info } from "lucide-react";
 import InlineReference from "@/components/InlineReference";
+import SequenceIndicator from "@/components/SequenceIndicator";
 import { getBidShortcutLabel } from "@/hooks/useKeyboardShortcuts";
 
 interface Props {
   settings: GameSettings;
   onComplete: (results: GameResults) => void;
   onQuit: () => void;
-}
-
-// Map a bid string to its keyboard shortcut key sequence
-function bidToKeySequence(bid: string): string {
-  if (bid === "pass") return "p";
-  const match = bid.match(/^(\d)(nt|[cdhs])$/i);
-  if (match) {
-    const level = match[1];
-    const strain = match[2].toLowerCase();
-    if (strain === "nt") return `${level}n`;
-    return `${level}${strain}`;
-  }
-  return "";
 }
 
 export default function OpeningBidPlay({
@@ -75,9 +63,7 @@ export default function OpeningBidPlay({
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showReference, setShowReference] = useState(false);
-  const [sequenceBuffer, setSequenceBuffer] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
-  const sequenceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Generate initial hand on mount
   useEffect(() => {
@@ -301,33 +287,6 @@ export default function OpeningBidPlay({
       if (key === "p" && availableBids.includes("Pass")) {
         e.preventDefault();
         submitAnswer("Pass");
-        setSequenceBuffer("");
-        return;
-      }
-
-      // Number keys start a sequence
-      if (/^[1-7]$/.test(key)) {
-        e.preventDefault();
-        setSequenceBuffer(key);
-        if (sequenceTimeout.current) clearTimeout(sequenceTimeout.current);
-        sequenceTimeout.current = setTimeout(() => {
-          setSequenceBuffer("");
-        }, 1500);
-        return;
-      }
-
-      // Second key of sequence (c, d, h, s, n)
-      if (sequenceBuffer && /^[cdhsn]$/.test(key)) {
-        e.preventDefault();
-        const strain = key === "n" ? "NT" : key.toUpperCase();
-        const bidKey = sequenceBuffer + strain;
-        if (sequenceTimeout.current) clearTimeout(sequenceTimeout.current);
-        setSequenceBuffer("");
-
-        if (availableBids.includes(bidKey)) {
-          submitAnswer(bidKey);
-          return;
-        }
         return;
       }
 
@@ -354,16 +313,8 @@ export default function OpeningBidPlay({
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      if (sequenceTimeout.current) clearTimeout(sequenceTimeout.current);
     };
-  }, [
-    feedback,
-    availableBids,
-    selectedIndex,
-    sequenceBuffer,
-    submitAnswer,
-    handleNext,
-  ]);
+  }, [feedback, availableBids, selectedIndex, submitAnswer, handleNext]);
 
   const hcp = handData ? calculateHCP(handData.hand) : 0;
 
@@ -425,17 +376,8 @@ export default function OpeningBidPlay({
                 What is your opening bid?
               </p>
 
-              {/* Sequence indicator */}
-              {sequenceBuffer && (
-                <div className="text-center mb-2">
-                  <span className="inline-flex items-center px-2 py-0.5 bg-primary/10 border border-primary/30 rounded text-xs font-mono text-primary">
-                    {sequenceBuffer}_{" "}
-                    <span className="ml-1 text-muted-foreground">
-                      (type C/D/H/S/N)
-                    </span>
-                  </span>
-                </div>
-              )}
+              {/* Sequence indicator (extracted for performance — owns its own state) */}
+              <SequenceIndicator onBid={submitAnswer} enabled={!feedback} />
 
               {/* Bid selection */}
               <AnimatePresence mode="wait">
