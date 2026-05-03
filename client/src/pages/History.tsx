@@ -222,7 +222,7 @@ function StatCard({
     <Card className="border-border/50 shadow-sm">
       <CardContent className="py-3 px-4">
         <div className="flex items-center gap-2 text-muted-foreground mb-1">
-          {icon}
+          <span aria-hidden="true">{icon}</span>
           <span className="text-xs uppercase tracking-wider">{label}</span>
         </div>
         <p className="font-mono text-xl font-bold">{value}</p>

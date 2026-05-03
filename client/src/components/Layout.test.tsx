@@ -109,6 +109,33 @@ describe("Layout", () => {
     expect(hamburger!.getAttribute("aria-expanded")).toBe("false");
   });
 
+  it("desktop sidebar has aria-label for accessible name", async () => {
+    const { default: Layout } = await import("@/components/Layout");
+    render(
+      <TestWrapper>
+        <Layout>Test content</Layout>
+      </TestWrapper>
+    );
+
+    const aside = document.querySelector("aside");
+    expect(aside).not.toBeNull();
+    expect(aside!.getAttribute("aria-label")).toBe("Sidebar navigation");
+  });
+
+  it("desktop nav element has descriptive aria-label", async () => {
+    const { default: Layout } = await import("@/components/Layout");
+    render(
+      <TestWrapper>
+        <Layout>Test content</Layout>
+      </TestWrapper>
+    );
+
+    // Desktop nav is always rendered; mobile nav is conditionally rendered
+    const nav = document.querySelector("nav");
+    expect(nav).not.toBeNull();
+    expect(nav!.getAttribute("aria-label")).toBe("Main navigation");
+  });
+
   it("does not call getAllGames on every render", async () => {
     const spy = vi.spyOn(gameRegistry, "getAllGames");
 

@@ -362,6 +362,7 @@ export default function PointCountingPlay({
                       value={userInput}
                       onChange={e => setUserInput(e.target.value)}
                       placeholder="HCP"
+                      aria-label="High card points"
                       className="text-center font-mono text-lg h-12"
                     />
                     <Button

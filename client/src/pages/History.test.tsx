@@ -112,4 +112,31 @@ describe("History", () => {
     // The delete button must have an accessible name
     expect(deleteButton!.getAttribute("aria-label")).toBe("Delete session");
   });
+
+  it("StatCard decorative icons have aria-hidden=true", async () => {
+    const { default: History } = await import("@/pages/History");
+    render(
+      <Switch>
+        <Route>{() => <History />}</Route>
+      </Switch>
+    );
+
+    // Wait for stats to render — stat labels are always shown when stats load
+    await screen.findByText("Sessions");
+
+    // Find all SVGs inside stat cards (icons next to stat labels)
+    const statCardSvgs = document.querySelectorAll(
+      '[data-slot="card-content"] svg'
+    );
+    expect(statCardSvgs.length).toBeGreaterThan(0);
+
+    // Every decorative icon in stat cards must be hidden from screen readers.
+    // The wrapping <span> should have aria-hidden="true" which hides the SVG
+    // from the accessibility tree.
+    Array.from(statCardSvgs).forEach(svg => {
+      const hiddenParent =
+        svg.closest('[aria-hidden="true"]') || svg.hasAttribute("aria-hidden");
+      expect(hiddenParent).toBeTruthy();
+    });
+  });
 });

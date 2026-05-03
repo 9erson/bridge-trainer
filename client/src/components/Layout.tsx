@@ -51,7 +51,10 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen flex">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-56 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shrink-0">
+      <aside
+        aria-label="Sidebar navigation"
+        className="hidden md:flex flex-col w-56 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shrink-0"
+      >
         <div className="p-4 border-b border-sidebar-border">
           <Link href="/" className="flex items-center gap-2 no-underline">
             <div className="w-8 h-8 rounded-md bg-sidebar-primary flex items-center justify-center">
@@ -62,7 +65,7 @@ export default function Layout({ children }: LayoutProps) {
             </span>
           </Link>
         </div>
-        <nav className="flex-1 p-3 space-y-0.5">
+        <nav aria-label="Main navigation" className="flex-1 p-3 space-y-0.5">
           {navItems.map(item => (
             <Link key={item.path} href={item.path}>
               <div
@@ -121,7 +124,7 @@ export default function Layout({ children }: LayoutProps) {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden border-t border-sidebar-border"
             >
-              <nav className="p-3 space-y-0.5">
+              <nav aria-label="Main navigation" className="p-3 space-y-0.5">
                 {navItems.map(item => (
                   <Link key={item.path} href={item.path}>
                     <div
