@@ -139,6 +139,144 @@ describe("Timer", () => {
     expect(screen.getByText("20s")).toBeDefined();
   });
 
+  it("has role='timer' on the container element", () => {
+    const { container } = render(
+      <Timer seconds={30} isRunning={true} onTimeUp={vi.fn()} />
+    );
+
+    const timer = container.querySelector("[role='timer']");
+    expect(timer).toBeTruthy();
+  });
+
+  it("has a visually-hidden aria-live region for screen reader announcements", () => {
+    const { container } = render(
+      <Timer seconds={30} isRunning={true} onTimeUp={vi.fn()} />
+    );
+
+    const liveRegion = container.querySelector("[aria-live='polite']");
+    expect(liveRegion).toBeTruthy();
+    expect(liveRegion!.className).toContain("sr-only");
+  });
+
+  it("announces remaining time at 10-second thresholds", () => {
+    const { container } = render(
+      <Timer seconds={60} isRunning={true} onTimeUp={vi.fn()} />
+    );
+
+    const getAnnouncement = () => {
+      const el = container.querySelector("[aria-live='polite']");
+      return el?.textContent ?? "";
+    };
+
+    // Initial: no announcement (60s is the start, not a threshold to announce)
+    expect(getAnnouncement()).toBe("");
+
+    // Tick down to 50 seconds
+    act(() => {
+      vi.advanceTimersByTime(10000);
+    });
+    expect(getAnnouncement()).toBe("50 seconds remaining");
+
+    // Tick down to 40 seconds
+    act(() => {
+      vi.advanceTimersByTime(10000);
+    });
+    expect(getAnnouncement()).toBe("40 seconds remaining");
+  });
+
+  it("does not announce at non-threshold seconds", () => {
+    const { container } = render(
+      <Timer seconds={60} isRunning={true} onTimeUp={vi.fn()} />
+    );
+
+    const getAnnouncement = () => {
+      const el = container.querySelector("[aria-live='polite']");
+      return el?.textContent ?? "";
+    };
+
+    // Tick down to 53 seconds (not a multiple of 10, not urgent)
+    act(() => {
+      vi.advanceTimersByTime(7000);
+    });
+    expect(getAnnouncement()).toBe("");
+
+    // Tick down to 47 seconds (still not a threshold)
+    act(() => {
+      vi.advanceTimersByTime(6000);
+    });
+    expect(getAnnouncement()).toBe("");
+  });
+
+  it("announces each second as urgent in the last 5 seconds", () => {
+    const { container } = render(
+      <Timer seconds={10} isRunning={true} onTimeUp={vi.fn()} />
+    );
+
+    const getAnnouncement = () => {
+      const el = container.querySelector("[aria-live='polite']");
+      return el?.textContent ?? "";
+    };
+
+    // Tick down to 5 seconds (just entered urgent zone)
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(getAnnouncement()).toBe("5 seconds remaining — urgent");
+
+    // 4 seconds
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(getAnnouncement()).toBe("4 seconds remaining — urgent");
+
+    // 3 seconds
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(getAnnouncement()).toBe("3 seconds remaining — urgent");
+  });
+
+  it("announces 'Time\\'s up' when timer reaches zero", () => {
+    const { container } = render(
+      <Timer seconds={5} isRunning={true} onTimeUp={vi.fn()} />
+    );
+
+    const getAnnouncement = () => {
+      const el = container.querySelector("[aria-live='polite']");
+      return el?.textContent ?? "";
+    };
+
+    // Let timer expire
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(getAnnouncement()).toBe("Time's up");
+  });
+
+  it("clears announcement when timer resets via seconds prop change", () => {
+    const { container, rerender } = render(
+      <Timer seconds={10} isRunning={true} onTimeUp={vi.fn()} />
+    );
+
+    const getAnnouncement = () => {
+      const el = container.querySelector("[aria-live='polite']");
+      return el?.textContent ?? "";
+    };
+
+    // Tick into urgent zone
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(getAnnouncement()).toBe("5 seconds remaining — urgent");
+
+    // Reset by changing seconds prop (simulates new hand)
+    rerender(<Timer seconds={30} isRunning={true} onTimeUp={vi.fn()} />);
+
+    // Announcement should be cleared — no stale "urgent" text
+    expect(getAnnouncement()).toBe("");
+  });
+
   it("calls the latest onTimeUp callback even if identity changes", () => {
     const staleCallback = vi.fn();
     const freshCallback = vi.fn();

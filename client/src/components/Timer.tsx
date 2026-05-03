@@ -7,6 +7,23 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Progress } from "@/components/ui/progress";
 
+/**
+ * Compute the screen reader announcement for the timer.
+ * Announces at 10-second thresholds, every second in the last 5,
+ * and "Time's up" at zero. Returns empty string otherwise.
+ */
+function getTimerAnnouncement(
+  displaySeconds: number,
+  isUrgent: boolean,
+  totalSeconds: number
+): string {
+  if (displaySeconds <= 0) return "Time's up";
+  if (isUrgent) return `${displaySeconds} seconds remaining — urgent`;
+  if (displaySeconds % 10 === 0 && displaySeconds < totalSeconds)
+    return `${displaySeconds} seconds remaining`;
+  return "";
+}
+
 interface TimerProps {
   seconds: number;
   isRunning: boolean;
@@ -53,10 +70,11 @@ export default function Timer({ seconds, isRunning, onTimeUp }: TimerProps) {
 
   const progress = (remaining / (seconds * 1000)) * 100;
   const displaySeconds = Math.ceil(remaining / 1000);
-  const isUrgent = remaining < 5000;
+  const isUrgent = remaining <= 5000;
+  const announcement = getTimerAnnouncement(displaySeconds, isUrgent, seconds);
 
   return (
-    <div className="flex items-center gap-3 w-full">
+    <div role="timer" className="flex items-center gap-3 w-full">
       <Progress
         value={progress}
         className={`h-2 flex-1 ${isUrgent ? "[&>div]:bg-destructive" : "[&>div]:bg-primary"}`}
@@ -66,6 +84,9 @@ export default function Timer({ seconds, isRunning, onTimeUp }: TimerProps) {
           ${isUrgent ? "text-destructive" : "text-muted-foreground"}`}
       >
         {displaySeconds}s
+      </span>
+      <span className="sr-only" aria-live="polite">
+        {announcement}
       </span>
     </div>
   );
