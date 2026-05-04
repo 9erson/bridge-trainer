@@ -4,9 +4,14 @@ import { resolve } from "node:path";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Route, Switch } from "wouter";
 
-// Read the source file to verify design-system compliance (pattern from History.test.tsx)
+// Read the source files to verify design-system compliance (pattern from History.test.tsx)
 const notFoundSource = readFileSync(
   resolve(import.meta.dirname, "NotFound.tsx"),
+  "utf-8"
+);
+
+const bridgeCardFanSource = readFileSync(
+  resolve(import.meta.dirname, "../components/BridgeCardFan.tsx"),
   "utf-8"
 );
 
@@ -78,6 +83,55 @@ describe("NotFound — design system compliance (#22)", () => {
 
   it("uses design-system text-muted-foreground token for body text", () => {
     expect(notFoundSource).toContain("text-muted-foreground");
+  });
+});
+
+describe("NotFound — bridge-themed visual element (#24)", () => {
+  it("renders a decorative SVG element with aria-hidden", async () => {
+    const { default: NotFound } = await import("@/pages/NotFound");
+    const { container } = render(
+      <Switch>
+        <Route>{() => <NotFound />}</Route>
+      </Switch>
+    );
+
+    const svg = container.querySelector(
+      'svg[aria-hidden="true"]'
+    ) as SVGSVGElement;
+    expect(svg).not.toBeNull();
+    expect(svg.getAttribute("role")).toBe("presentation");
+  });
+
+  it("renders all four suit symbols inside the SVG", async () => {
+    const { default: NotFound } = await import("@/pages/NotFound");
+    const { container } = render(
+      <Switch>
+        <Route>{() => <NotFound />}</Route>
+      </Switch>
+    );
+
+    const svg = container.querySelector(
+      'svg[aria-hidden="true"]'
+    ) as SVGSVGElement;
+    const textContent = svg.textContent ?? "";
+    expect(textContent).toContain("♠");
+    expect(textContent).toContain("♥");
+    expect(textContent).toContain("♦");
+    expect(textContent).toContain("♣");
+  });
+
+  it("uses CSS custom properties for suit colors, not hard-coded hex", () => {
+    expect(bridgeCardFanSource).toContain("var(--suit-black)");
+    expect(bridgeCardFanSource).toContain("var(--suit-red)");
+    expect(bridgeCardFanSource).toContain("var(--card)");
+    expect(bridgeCardFanSource).toContain("var(--border)");
+    // No hard-coded hex colors in the SVG
+    expect(bridgeCardFanSource).not.toContain('fill="#');
+    expect(bridgeCardFanSource).not.toContain('stroke="#');
+  });
+
+  it("does not import AlertCircle (replaced by bridge card fan)", () => {
+    expect(notFoundSource).not.toContain("AlertCircle");
   });
 });
 

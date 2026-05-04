@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
+import BridgeCardFan from "@/components/BridgeCardFan";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Home } from "lucide-react";
+import { Home } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function NotFound() {
@@ -14,9 +15,7 @@ export default function NotFound() {
     <div className="min-h-screen w-full flex items-center justify-center bg-background">
       <Card className="w-full max-w-lg mx-4">
         <CardContent className="pt-8 pb-8 text-center">
-          <div className="flex justify-center mb-6">
-            <AlertCircle className="h-16 w-16 text-muted-foreground" />
-          </div>
+          <BridgeCardFan />
 
           <h1 className="text-4xl font-bold text-foreground mb-2">404</h1>
 
