@@ -80,13 +80,14 @@ describe("App", () => {
     const { default: App } = await import("@/App");
     render(<App />);
 
-    // App renders the Home page at "/" — look for known content
-    // The home page should show game cards
+    // App renders the Home page at "/" — look for known content.
+    // Game names appear in both the Layout sidebar nav and the Home
+    // page game cards, so use getAllByText to avoid ambiguity.
     await waitFor(() => {
-      expect(screen.getByText("Point Counting")).toBeDefined();
+      expect(screen.getAllByText("Point Counting").length).toBeGreaterThan(0);
     });
-    expect(screen.getByText("Opening Bid")).toBeDefined();
-    expect(screen.getByText("Responding")).toBeDefined();
+    expect(screen.getAllByText("Opening Bid").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Responding").length).toBeGreaterThan(0);
   });
 });
 
