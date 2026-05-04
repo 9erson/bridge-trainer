@@ -10,15 +10,12 @@ import { Button } from "@/components/ui/button";
 import { getConventionRef } from "@/lib/conventionReferenceData";
 import { BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import OpeningBidsTable from "@/components/OpeningBidsTable";
 
 interface Props {
   conventionId: string;
   isOpen?: boolean;
   onToggle?: () => void;
-}
-
-function renderBidInline(bid: string): string {
-  return bid;
 }
 
 export default function InlineReference({
@@ -73,41 +70,7 @@ export default function InlineReference({
                 <h4 className="text-xs font-semibold text-foreground/80 uppercase tracking-wide mb-2">
                   Opening Bids
                 </h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="border-b border-border/50">
-                        <th className="text-left py-1 pr-2 font-semibold text-muted-foreground w-14">
-                          Bid
-                        </th>
-                        <th className="text-left py-1 pr-2 font-semibold text-muted-foreground w-16">
-                          HCP
-                        </th>
-                        <th className="text-left py-1 font-semibold text-muted-foreground">
-                          Requirement
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {conv.openingBids.map((row, i) => (
-                        <tr
-                          key={i}
-                          className="border-b border-border/30 last:border-0"
-                        >
-                          <td className="py-1 pr-2 font-mono font-bold text-foreground">
-                            {renderBidInline(row.bid)}
-                          </td>
-                          <td className="py-1 pr-2 font-mono text-muted-foreground">
-                            {row.hcp}
-                          </td>
-                          <td className="py-1 text-foreground/70">
-                            {row.description}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <OpeningBidsTable bids={conv.openingBids} variant="inline" />
               </div>
 
               {/* Key Rules */}

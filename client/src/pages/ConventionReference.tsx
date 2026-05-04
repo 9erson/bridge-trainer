@@ -5,11 +5,12 @@
 // Card Table Modernist theme
 // ============================================================
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
+import OpeningBidsTable from "@/components/OpeningBidsTable";
 
 // ---- Data ----
 
@@ -258,22 +259,6 @@ const conventions: ConventionRef[] = [
   },
 ];
 
-// ---- Suit symbol rendering ----
-
-function renderBid(bid: string): React.ReactNode {
-  const colored = bid
-    .replace(/♠/g, '<span style="color:var(--suit-black)">♠</span>')
-    .replace(/♥/g, '<span style="color:var(--suit-red)">♥</span>')
-    .replace(/♦/g, '<span style="color:var(--suit-red)">♦</span>')
-    .replace(/♣/g, '<span style="color:var(--suit-black)">♣</span>');
-  return (
-    <span
-      className="font-mono font-bold"
-      dangerouslySetInnerHTML={{ __html: colored }}
-    />
-  );
-}
-
 // ---- Component ----
 
 export default function ConventionReference() {
@@ -359,39 +344,7 @@ function ConventionCard({ convention }: { convention: ConventionRef }) {
           <CardTitle className="text-base font-sans">Opening Bids</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground w-16">
-                    Bid
-                  </th>
-                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground w-20">
-                    HCP
-                  </th>
-                  <th className="text-left py-2 font-semibold text-muted-foreground">
-                    Description
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {convention.openingBids.map((row, i) => (
-                  <tr
-                    key={i}
-                    className="border-b border-border/50 last:border-0"
-                  >
-                    <td className="py-1.5 pr-3">{renderBid(row.bid)}</td>
-                    <td className="py-1.5 pr-3 font-mono text-xs text-muted-foreground">
-                      {row.hcp}
-                    </td>
-                    <td className="py-1.5 text-foreground/80">
-                      {row.description}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <OpeningBidsTable bids={convention.openingBids} variant="page" />
         </CardContent>
       </Card>
 
@@ -421,7 +374,7 @@ function ConventionCard({ convention }: { convention: ConventionRef }) {
           <div className="space-y-2">
             {convention.keyConventions.map((conv, i) => (
               <div key={i} className="flex gap-2 text-sm">
-                <span className="font-semibold text-foreground shrink-0 min-w-[120px]">
+                <span className="font-semibold text-foreground shrink-0 md:min-w-[120px]">
                   {conv.name}
                 </span>
                 <span className="text-foreground/70">{conv.description}</span>

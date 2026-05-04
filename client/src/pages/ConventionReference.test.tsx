@@ -1,58 +1,56 @@
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
-import React from "react";
+import { describe, it, expect } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 
-// We need to extract renderBid for testing. Since it's a private function
-// in ConventionReference.tsx, we test it indirectly by checking the HTML
-// output of the component. However, the function uses static data, so
-// we can verify the contract by testing it as a module export.
-//
-// Approach: duplicate the renderBid logic in a test-friendly way by
-// importing and checking the component renders var()-based styles.
+const pageSource = fs.readFileSync(
+  path.resolve(import.meta.dirname, "../pages/ConventionReference.tsx"),
+  "utf-8"
+);
 
-// Helper: extract the renderBid logic to test independently.
-// ConventionReference.tsx defines it as a module-level function.
-// We'll test by rendering a minimal wrapper and checking HTML output.
-
-function renderBidHtml(bid: string): string {
-  // Mirrors the renderBid implementation in ConventionReference.tsx
-  const colored = bid
-    .replace(/♠/g, '<span style="color:var(--suit-black)">♠</span>')
-    .replace(/♥/g, '<span style="color:var(--suit-red)">♥</span>')
-    .replace(/♦/g, '<span style="color:var(--suit-red)">♦</span>')
-    .replace(/♣/g, '<span style="color:var(--suit-black)">♣</span>');
-  return colored;
-}
-
-describe("renderBid (ConventionReference)", () => {
-  it("uses CSS variable styles instead of Tailwind classes for heart symbols", () => {
-    const html = renderBidHtml("1♥");
-    expect(html).toContain('style="color:var(--suit-red)"');
-    expect(html).not.toContain("text-red-600");
+describe("ConventionReference — responsive opening bids (#28)", () => {
+  it("imports OpeningBidsTable component instead of rendering inline table", () => {
+    expect(
+      pageSource,
+      "ConventionReference should import OpeningBidsTable"
+    ).toContain("OpeningBidsTable");
   });
 
-  it("uses CSS variable styles instead of Tailwind classes for diamond symbols", () => {
-    const html = renderBidHtml("2♦");
-    expect(html).toContain('style="color:var(--suit-red)"');
-    expect(html).not.toContain("text-red-600");
+  it("does not contain overflow-x-auto (no horizontal scrolling)", () => {
+    expect(
+      pageSource,
+      "ConventionReference should NOT use overflow-x-auto"
+    ).not.toContain("overflow-x-auto");
   });
 
-  it("uses CSS variable styles for spade symbols", () => {
-    const html = renderBidHtml("1♠");
-    expect(html).toContain('style="color:var(--suit-black)"');
-    expect(html).not.toContain("text-foreground");
+  it("does not contain an inline <table> element", () => {
+    // After refactoring, the <table> lives inside OpeningBidsTable, not here.
+    expect(
+      pageSource,
+      "ConventionReference should NOT contain a raw <table> tag"
+    ).not.toContain("<table");
+  });
+});
+
+describe("ConventionReference — Key Conventions responsive layout (#28)", () => {
+  it("uses md:min-w for convention name to allow wrapping on mobile", () => {
+    // The convention name span must use md:min-w-[120px] (not unconditional min-w)
+    // so names can wrap naturally on small screens.
+    expect(
+      pageSource,
+      "Key Conventions name should use md:min-w-[120px]"
+    ).toContain("md:min-w-[120px]");
   });
 
-  it("uses CSS variable styles for club symbols", () => {
-    const html = renderBidHtml("1♣");
-    expect(html).toContain('style="color:var(--suit-black)"');
-    expect(html).not.toContain("text-foreground");
-  });
-
-  it("preserves bid text alongside colored symbols", () => {
-    const html = renderBidHtml("2♥/♠");
-    expect(html).toContain("2");
-    expect(html).toContain("var(--suit-red)");
-    expect(html).toContain("var(--suit-black)");
+  it("does not use unconditional min-w on convention names", () => {
+    // Extract the Key Conventions section
+    const keyConvSection = pageSource.substring(
+      pageSource.indexOf("Key Conventions")
+    );
+    // Check for min-w that is NOT preceded by md: (unconditional min-width)
+    const unconditionalMinW = keyConvSection.match(/(?<!md:)min-w-\[/);
+    expect(
+      unconditionalMinW,
+      "Key Conventions should NOT have unconditional min-w"
+    ).toBeNull();
   });
 });
