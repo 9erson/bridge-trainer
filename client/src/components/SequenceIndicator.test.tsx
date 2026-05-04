@@ -2,6 +2,15 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import SequenceIndicator from "./SequenceIndicator";
 
+// React.memo components are objects with $$typeof = Symbol(react.memo)
+// This test prevents accidental removal of the memoization wrapper.
+describe("SequenceIndicator — React.memo optimization", () => {
+  it("is wrapped in React.memo", () => {
+    expect(typeof SequenceIndicator).toBe("object");
+    expect(SequenceIndicator.$$typeof).toBe(Symbol.for("react.memo"));
+  });
+});
+
 function fireDocKey(key: string) {
   act(() => {
     document.dispatchEvent(
