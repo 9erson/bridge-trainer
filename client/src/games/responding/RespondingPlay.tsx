@@ -486,14 +486,17 @@ export default function RespondingPlay({
           </Button>
 
           <AnimatePresence>
-            {showReference && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
+            <motion.div
+              initial={{ gridTemplateRows: "0fr", opacity: 0 }}
+              animate={
+                showReference
+                  ? { gridTemplateRows: "1fr", opacity: 1 }
+                  : { gridTemplateRows: "0fr", opacity: 0 }
+              }
+              transition={{ duration: 0.2 }}
+              style={{ display: "grid" }}
+            >
+              <div className="overflow-hidden" style={{ minHeight: 0 }}>
                 <div className="mt-3 rounded-lg border border-border/60 bg-muted/30 p-4 space-y-3">
                   <h4 className="text-xs font-semibold text-foreground/80 uppercase tracking-wide">
                     {refData.title}
@@ -512,8 +515,8 @@ export default function RespondingPlay({
                     ))}
                   </ul>
                 </div>
-              </motion.div>
-            )}
+              </div>
+            </motion.div>
           </AnimatePresence>
         </div>
       )}

@@ -18,3 +18,26 @@ describe("RespondingPlay — theme tokens (#32)", () => {
     expect(source).toContain("border-primary/30");
   });
 });
+
+describe("RespondingPlay — layout thrashing fix (#17)", () => {
+  it("reference panel animation does not use height: 'auto' (causes forced reflows)", () => {
+    expect(
+      source,
+      "RespondingPlay reference panel should NOT animate height:'auto'"
+    ).not.toContain('height: "auto"');
+  });
+
+  it("reference panel animation uses grid-template-rows instead of height", () => {
+    expect(
+      source,
+      "RespondingPlay reference panel should use gridTemplateRows for collapse animation"
+    ).toContain("gridTemplateRows");
+  });
+
+  it("reference panel animation wrapper uses display: grid", () => {
+    expect(
+      source,
+      "RespondingPlay reference panel container should use display:grid"
+    ).toMatch(/display:\s*["']?grid["']?/);
+  });
+});

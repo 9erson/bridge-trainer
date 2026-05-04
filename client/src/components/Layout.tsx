@@ -115,15 +115,20 @@ export default function Layout({ children }: LayoutProps) {
           </Button>
         </div>
 
-        {/* Mobile nav dropdown */}
+        {/* Mobile nav dropdown — grid-template-rows avoids forced reflows (#17) */}
         <AnimatePresence>
-          {sidebarOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden border-t border-sidebar-border"
-            >
+          <motion.div
+            initial={{ gridTemplateRows: "0fr", opacity: 0 }}
+            animate={
+              sidebarOpen
+                ? { gridTemplateRows: "1fr", opacity: 1 }
+                : { gridTemplateRows: "0fr", opacity: 0 }
+            }
+            transition={{ duration: 0.2 }}
+            style={{ display: "grid" }}
+            className="border-t border-sidebar-border"
+          >
+            <div className="overflow-hidden" style={{ minHeight: 0 }}>
               <nav aria-label="Main navigation" className="p-3 space-y-0.5">
                 {navItems.map(item => (
                   <Link key={item.path} href={item.path}>
@@ -143,8 +148,8 @@ export default function Layout({ children }: LayoutProps) {
                   </Link>
                 ))}
               </nav>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
         </AnimatePresence>
       </div>
 

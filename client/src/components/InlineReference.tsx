@@ -56,14 +56,17 @@ export default function InlineReference({
       </Button>
 
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
+        <motion.div
+          initial={{ gridTemplateRows: "0fr", opacity: 0 }}
+          animate={
+            isOpen
+              ? { gridTemplateRows: "1fr", opacity: 1 }
+              : { gridTemplateRows: "0fr", opacity: 0 }
+          }
+          transition={{ duration: 0.2 }}
+          style={{ display: "grid" }}
+        >
+          <div className="overflow-hidden" style={{ minHeight: 0 }}>
             <div className="mt-3 rounded-lg border border-border/60 bg-muted/30 p-4 space-y-4">
               {/* Opening Bids Table */}
               <div>
@@ -91,8 +94,8 @@ export default function InlineReference({
                 </ul>
               </div>
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
       </AnimatePresence>
     </div>
   );

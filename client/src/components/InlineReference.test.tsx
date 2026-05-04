@@ -29,3 +29,26 @@ describe("InlineReference — responsive opening bids (#28)", () => {
     ).not.toContain("<table");
   });
 });
+
+describe("InlineReference — layout thrashing fix (#17)", () => {
+  it("panel animation does not use height: 'auto' (causes forced reflows)", () => {
+    expect(
+      componentSource,
+      "InlineReference should NOT animate height:'auto'"
+    ).not.toContain('height: "auto"');
+  });
+
+  it("panel animation uses grid-template-rows instead of height", () => {
+    expect(
+      componentSource,
+      "InlineReference should use gridTemplateRows for collapse animation"
+    ).toContain("gridTemplateRows");
+  });
+
+  it("panel animation wrapper uses display: grid", () => {
+    expect(
+      componentSource,
+      "InlineReference container should use display:grid for grid-template-rows animation"
+    ).toMatch(/display:\s*["']?grid["']?/);
+  });
+});

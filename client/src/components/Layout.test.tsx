@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import fs from "node:fs";
+import path from "node:path";
 
 // We need to register at least one game so the Layout has nav items to render.
 // Import game modules for their side-effect registrations.
@@ -36,6 +38,11 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
+const layoutSource = fs.readFileSync(
+  path.resolve(import.meta.dirname, "Layout.tsx"),
+  "utf-8"
+);
+
 describe("Layout", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -49,15 +56,18 @@ describe("Layout", () => {
       </TestWrapper>
     );
 
-    // Core nav items that always exist
-    expect(screen.getByText("Games")).toBeDefined();
-    expect(screen.getByText("History")).toBeDefined();
-    expect(screen.getByText("Reference")).toBeDefined();
+    // Core nav items that always exist (appear in both desktop sidebar and
+    // mobile nav, so use getAllByText)
+    expect(screen.getAllByText("Games").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("History").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Reference").length).toBeGreaterThanOrEqual(1);
 
     // Game nav items (registered via side-effect imports)
-    expect(screen.getByText("Point Counting")).toBeDefined();
-    expect(screen.getByText("Opening Bid")).toBeDefined();
-    expect(screen.getByText("Responding")).toBeDefined();
+    expect(screen.getAllByText("Point Counting").length).toBeGreaterThanOrEqual(
+      1
+    );
+    expect(screen.getAllByText("Opening Bid").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Responding").length).toBeGreaterThanOrEqual(1);
 
     // Children are rendered
     expect(screen.getByText("Test content")).toBeDefined();
@@ -163,5 +173,28 @@ describe("Layout", () => {
 
     // Verify the re-rendered content is still correct
     expect(screen.getByText("Second render")).toBeDefined();
+  });
+});
+
+describe("Layout — layout thrashing fix (#17)", () => {
+  it("mobile nav animation does not use height: 'auto' (causes forced reflows)", () => {
+    expect(
+      layoutSource,
+      "Layout mobile nav should NOT animate height:'auto'"
+    ).not.toContain('height: "auto"');
+  });
+
+  it("mobile nav animation uses grid-template-rows instead of height", () => {
+    expect(
+      layoutSource,
+      "Layout mobile nav should use grid-template-rows for collapse animation"
+    ).toContain("gridTemplateRows");
+  });
+
+  it("mobile nav animation wrapper uses display: grid", () => {
+    expect(
+      layoutSource,
+      "Layout mobile nav container should use display:grid for grid-template-rows animation"
+    ).toMatch(/display:\s*["']?grid["']?/);
   });
 });
