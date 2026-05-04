@@ -19,6 +19,15 @@ describe("RespondingPlay — theme tokens (#32)", () => {
   });
 });
 
+describe("RespondingPlay — touch targets (WCAG 2.5.8, #7)", () => {
+  it("bid buttons use h-11 (44px) to meet WCAG minimum touch target", () => {
+    // Bid buttons must be at least 44x44px per WCAG 2.5.8.
+    // h-10 = 40px (too small), h-11 = 44px (minimum).
+    expect(source).not.toContain("h-10");
+    expect(source).toContain("h-11");
+  });
+});
+
 describe("RespondingPlay — layout thrashing fix (#17)", () => {
   it("reference panel animation does not use height: 'auto' (causes forced reflows)", () => {
     expect(

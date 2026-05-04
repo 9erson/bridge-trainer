@@ -439,7 +439,7 @@ export default function RespondingPlay({
                   <Button
                     key={bid}
                     variant="outline"
-                    className={`h-10 px-3 font-semibold text-sm min-w-[3.5rem] relative transition-all ${
+                    className={`h-11 px-3 font-semibold text-sm min-w-[3.5rem] relative transition-all ${
                       selectedIndex === idx
                         ? "ring-2 ring-primary ring-offset-1 bg-primary/5"
                         : ""
