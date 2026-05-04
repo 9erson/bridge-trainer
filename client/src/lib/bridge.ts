@@ -76,12 +76,32 @@ export const HCP_VALUES: Partial<Record<Rank, number>> = {
   J: 1,
 };
 
+// ACBL dummy (support) point values for short suits
+export const DUMMY_POINT_VALUES: Record<number, number> = {
+  0: 5, // void
+  1: 3, // singleton
+  2: 1, // doubleton
+};
+
 // Calculate high card points for a hand
 export function calculateHCP(hand: BridgeHand): number {
   return hand.cards.reduce(
     (total, card) => total + (HCP_VALUES[card.rank] || 0),
     0
   );
+}
+
+// Calculate dummy (support) points for short suits
+// When trumpSuit is provided, only non-trump suits are evaluated
+export function calculateDummyPoints(
+  hand: BridgeHand,
+  trumpSuit?: Suit
+): number {
+  return SUITS.reduce((total, suit) => {
+    if (trumpSuit !== undefined && suit === trumpSuit) return total;
+    const length = getSuitLength(hand, suit);
+    return total + (DUMMY_POINT_VALUES[length] || 0);
+  }, 0);
 }
 
 // Get suit length for a hand
