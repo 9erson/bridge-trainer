@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import React, { Suspense, lazy } from "react";
@@ -85,5 +87,29 @@ describe("App", () => {
     });
     expect(screen.getByText("Opening Bid")).toBeDefined();
     expect(screen.getByText("Responding")).toBeDefined();
+  });
+});
+
+describe("App — lazy-loaded ConventionReference (#12)", () => {
+  const appSource = fs.readFileSync(
+    path.resolve(import.meta.dirname, "App.tsx"),
+    "utf-8"
+  );
+
+  it("uses lazy() to load ConventionReference page", () => {
+    expect(appSource, "App.tsx should lazy-load ConventionReference").toContain(
+      "lazy(() =>"
+    );
+    expect(
+      appSource,
+      "App.tsx should dynamically import ConventionReference"
+    ).toContain('import("./pages/ConventionReference")');
+  });
+
+  it("does NOT statically import ConventionReference", () => {
+    expect(
+      appSource,
+      "App.tsx should NOT have a static import of ConventionReference"
+    ).not.toMatch(/^import\s+ConventionReference\s+from/m);
   });
 });

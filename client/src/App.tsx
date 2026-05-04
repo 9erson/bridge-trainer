@@ -3,7 +3,7 @@
 // Card Table Modernist theme — light mode
 // ============================================================
 
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -15,7 +15,7 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import GamePage from "./pages/GamePage";
 import History from "./pages/History";
-import ConventionReference from "./pages/ConventionReference";
+const ConventionReference = lazy(() => import("./pages/ConventionReference"));
 
 // Register all games (side-effect imports)
 import "./lib/conventionData";
