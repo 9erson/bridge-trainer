@@ -35,10 +35,7 @@ export default function PointCountingSetup({ onStart }: Props) {
   const extraSettings = (
     <div className="space-y-2">
       <Label className="text-sm font-medium">Point Valuation</Label>
-      <Select
-        value={mode}
-        onValueChange={v => setMode(v as PointMode)}
-      >
+      <Select value={mode} onValueChange={v => setMode(v as PointMode)}>
         <SelectTrigger aria-label="Point Valuation">
           <SelectValue />
         </SelectTrigger>

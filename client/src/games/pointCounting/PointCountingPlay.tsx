@@ -112,11 +112,7 @@ export default function PointCountingPlay({
   const generateNewHand = useCallback(() => {
     const newHand = generateRandomHand();
     const newTrump = mode === "support" ? generateRandomTrumpSuit() : null;
-    const answer = computeCorrectAnswer(
-      newHand,
-      mode,
-      newTrump ?? undefined
-    );
+    const answer = computeCorrectAnswer(newHand, mode, newTrump ?? undefined);
 
     setHand(newHand);
     setTrumpSuit(newTrump);
