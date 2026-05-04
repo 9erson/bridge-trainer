@@ -90,6 +90,32 @@ describe("App", () => {
   });
 });
 
+describe("App — lazy-loaded History page (#11)", () => {
+  const appSource = fs.readFileSync(
+    path.resolve(import.meta.dirname, "App.tsx"),
+    "utf-8"
+  );
+
+  it("History module has a default export compatible with React.lazy", async () => {
+    const mod = await import("@/pages/History");
+    expect(mod.default).toBeDefined();
+    expect(typeof mod.default).toBe("function");
+  });
+
+  it("uses lazy() to load History page", () => {
+    expect(appSource, "App.tsx should lazy-load History").toContain(
+      'lazy(() => import("./pages/History"))'
+    );
+  });
+
+  it("does NOT statically import History", () => {
+    expect(
+      appSource,
+      "App.tsx should NOT have a static import of History"
+    ).not.toMatch(/^import\s+History\s+from/m);
+  });
+});
+
 describe("App — lazy-loaded ConventionReference (#12)", () => {
   const appSource = fs.readFileSync(
     path.resolve(import.meta.dirname, "App.tsx"),

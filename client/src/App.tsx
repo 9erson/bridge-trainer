@@ -14,7 +14,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import GamePage from "./pages/GamePage";
-import History from "./pages/History";
+const History = lazy(() => import("./pages/History"));
 const ConventionReference = lazy(() => import("./pages/ConventionReference"));
 
 // Register all games (side-effect imports)
