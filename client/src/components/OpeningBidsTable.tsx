@@ -18,18 +18,51 @@ interface OpeningBidsTableProps {
   variant: "page" | "inline";
 }
 
+const SUIT_STYLES: Record<string, React.CSSProperties> = {
+  "♠": { color: "var(--suit-black)" },
+  "♥": { color: "var(--suit-red)" },
+  "♦": { color: "var(--suit-red)" },
+  "♣": { color: "var(--suit-black)" },
+};
+
 function renderBid(bid: string): React.ReactNode {
-  const colored = bid
-    .replace(/♠/g, '<span style="color:var(--suit-black)">♠</span>')
-    .replace(/♥/g, '<span style="color:var(--suit-red)">♥</span>')
-    .replace(/♦/g, '<span style="color:var(--suit-red)">♦</span>')
-    .replace(/♣/g, '<span style="color:var(--suit-black)">♣</span>');
-  return (
-    <span
-      className="font-mono font-bold"
-      dangerouslySetInnerHTML={{ __html: colored }}
-    />
-  );
+  const parts: React.ReactNode[] = [];
+  let remaining = bid;
+
+  for (const char of bid) {
+    if (SUIT_STYLES[char]) {
+      parts.push(
+        <span key={parts.length} style={SUIT_STYLES[char]}>
+          {char}
+        </span>
+      );
+    }
+  }
+
+  // If no suit symbols found, return the plain string
+  if (parts.length === 0) {
+    return bid;
+  }
+
+  // Build the full bid: extract prefix before suit symbols
+  // Assumes format like "1♠", "2♥", "1NT", "X", etc.
+  const suitChars = Object.keys(SUIT_STYLES);
+  let prefix = remaining;
+  for (const s of suitChars) {
+    prefix = prefix.replaceAll(s, "");
+  }
+  prefix = prefix.trim();
+
+  if (prefix) {
+    return (
+      <span className="font-mono font-bold">
+        {prefix}
+        {parts}
+      </span>
+    );
+  }
+
+  return <span className="font-mono font-bold">{parts}</span>;
 }
 
 function renderBidPlain(bid: string): string {

@@ -29,7 +29,7 @@ export default function Home() {
           height="300"
           className="w-full h-40 sm:h-52 object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/50 to-transparent" />
         <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
             Bridge Trainer

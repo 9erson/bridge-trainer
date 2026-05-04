@@ -133,6 +133,22 @@ describe("Home page", () => {
     }
   });
 
+  it("hero overlay uses theme-aware gradient, not hard-coded from-black", async () => {
+    const { default: Home } = await import("@/pages/Home");
+    const { container } = render(<Home />);
+
+    const overlay = container.querySelector(
+      '[class*="bg-gradient-to-r"]'
+    ) as HTMLElement;
+    expect(overlay).not.toBeNull();
+    expect(overlay.className).not.toContain("from-black");
+    // Should use a theme token like primary or a semantic color
+    expect(
+      overlay.className.includes("from-primary") ||
+        overlay.className.includes("from-foreground")
+    ).toBe(true);
+  });
+
   it("does not call getAllGames on every render", async () => {
     const spy = vi.spyOn(gameRegistry, "getAllGames");
 
