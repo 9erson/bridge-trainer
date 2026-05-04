@@ -34,6 +34,8 @@ export default function PointCountingResults({
   const mistakes = results.hands.filter(h => !h.isCorrect);
   const avgHCP = (results.extraData.averageHCP as number) ?? 0;
   const pct = Math.round(results.accuracy * 100);
+  const mode = (results.settings?.extra?.mode as "hcp" | "support") ?? "hcp";
+  const pointsLabel = mode === "support" ? "Avg SP" : "Avg HCP";
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-4">
@@ -66,7 +68,7 @@ export default function PointCountingResults({
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Avg HCP
+                  {pointsLabel}
                 </p>
                 <p className="font-mono text-lg font-semibold">
                   {avgHCP.toFixed(1)}

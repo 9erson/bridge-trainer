@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import PointCountingResults from "./PointCountingResults";
 import type { GameResults } from "@/lib/gameRegistry";
 
@@ -86,5 +86,76 @@ describe("PointCountingResults — responsive layout (#38)", () => {
     // gap-2 sm:gap-4 uses tighter 8px gap on mobile, standard 16px on desktop.
     expect(source).toContain("gap-2 sm:gap-4");
     expect(source).not.toMatch(/grid-cols-3 gap-4(?! )/);
+  });
+});
+
+// ============================================================
+// Support Points mode tests (#56)
+// ============================================================
+
+describe("PointCountingResults — support points mode (#56)", () => {
+  it("shows 'Avg SP' label when mode is support", () => {
+    const results = makeResults({
+      settings: {
+        gameId: "point-counting",
+        difficulty: "easy",
+        handCount: 2,
+        timerSeconds: null,
+        feedbackMode: "immediate",
+        displayMode: "text",
+        extra: { mode: "support" },
+      },
+      extraData: { averageHCP: 4.5 },
+    });
+    render(
+      <PointCountingResults
+        results={results}
+        onPlayAgain={() => {}}
+        onBackToMenu={() => {}}
+      />
+    );
+
+    expect(screen.getByText("Avg SP")).toBeTruthy();
+    expect(screen.queryByText("Avg HCP")).toBeNull();
+  });
+
+  it("shows 'Avg HCP' label when mode is hcp (default)", () => {
+    const results = makeResults({
+      extraData: { averageHCP: 12 },
+    });
+    render(
+      <PointCountingResults
+        results={results}
+        onPlayAgain={() => {}}
+        onBackToMenu={() => {}}
+      />
+    );
+
+    expect(screen.getByText("Avg HCP")).toBeTruthy();
+    expect(screen.queryByText("Avg SP")).toBeNull();
+  });
+
+  it("shows 'Avg HCP' label when mode is undefined (backward compat)", () => {
+    const results = makeResults({
+      settings: {
+        gameId: "point-counting",
+        difficulty: "easy",
+        handCount: 2,
+        timerSeconds: null,
+        feedbackMode: "immediate",
+        displayMode: "text",
+        extra: {},
+      },
+      extraData: { averageHCP: 12 },
+    });
+    render(
+      <PointCountingResults
+        results={results}
+        onPlayAgain={() => {}}
+        onBackToMenu={() => {}}
+      />
+    );
+
+    expect(screen.getByText("Avg HCP")).toBeTruthy();
   });
 });

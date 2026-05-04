@@ -1,6 +1,7 @@
 // ============================================================
 // Point Counting Game Module
 // Practice counting high card points (A=4, K=3, Q=2, J=1)
+// and support/dummy points (Void=5, Singleton=3, Doubleton=1)
 // ============================================================
 
 import { registerGame } from "@/lib/gameRegistry";
@@ -14,7 +15,7 @@ export const pointCountingConfig = {
   id: "point-counting",
   name: "Point Counting",
   description:
-    "Practice counting high card points quickly and accurately. A=4, K=3, Q=2, J=1.",
+    "Practice counting high card points (HCP) or support points (ACBL dummy points). Choose your valuation mode in setup.",
   icon: POINT_COUNTING_ICON,
   difficulties: [
     { id: "easy", label: "Easy", description: "Multiple choice" },

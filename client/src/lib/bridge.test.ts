@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { SUIT_COLORS, calculateDummyPoints, type BridgeHand } from "./bridge";
+import {
+  SUIT_COLORS,
+  calculateDummyPoints,
+  generateSupportPointChoices,
+  generateRandomTrumpSuit,
+  SUITS,
+  type BridgeHand,
+} from "./bridge";
 
 describe("SUIT_COLORS", () => {
   it("returns CSS variable references instead of raw hex values", () => {
@@ -89,5 +96,46 @@ describe("calculateDummyPoints", () => {
     // 0-1-7-5 with diamonds as trump: void in S (5) + singleton in H (3) = 8
     const hand = makeHand({ S: 0, H: 1, D: 7, C: 5 });
     expect(calculateDummyPoints(hand, "D")).toBe(8);
+  });
+});
+
+describe("generateSupportPointChoices", () => {
+  it("returns 5 unique sorted choices that include the correct answer", () => {
+    const choices = generateSupportPointChoices(4);
+    expect(choices).toHaveLength(5);
+    expect(new Set(choices).size).toBe(5);
+    expect(choices).toEqual([...choices].sort((a, b) => a - b));
+    expect(choices).toContain(4);
+  });
+
+  it("keeps all choices within 0–10 range", () => {
+    for (let correct = 0; correct <= 10; correct++) {
+      const choices = generateSupportPointChoices(correct);
+      for (const c of choices) {
+        expect(c).toBeGreaterThanOrEqual(0);
+        expect(c).toBeLessThanOrEqual(10);
+      }
+    }
+  });
+
+  it("never produces negative choices when correct answer is 0", () => {
+    const choices = generateSupportPointChoices(0);
+    expect(choices.every(c => c >= 0)).toBe(true);
+    expect(choices).toContain(0);
+  });
+
+  it("never exceeds 10 when correct answer is 10", () => {
+    const choices = generateSupportPointChoices(10);
+    expect(choices.every(c => c <= 10)).toBe(true);
+    expect(choices).toContain(10);
+  });
+});
+
+describe("generateRandomTrumpSuit", () => {
+  it("returns a valid suit", () => {
+    for (let i = 0; i < 20; i++) {
+      const suit = generateRandomTrumpSuit();
+      expect(SUITS).toContain(suit);
+    }
   });
 });

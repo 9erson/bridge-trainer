@@ -1,6 +1,7 @@
 // ============================================================
 // PointCountingPlay — main gameplay for point counting
 // Supports easy (multiple choice) and hard (type answer)
+// Modes: HCP (default) and Support Points (ACBL dummy points)
 // Full keyboard support: number keys, arrows, Enter/Space/N
 // ============================================================
 
@@ -13,9 +14,17 @@ import DisplayModeToggle from "@/components/DisplayModeToggle";
 import GameShell from "@/components/GameShell";
 import {
   generateRandomHand,
+  generateRandomTrumpSuit,
   calculateHCP,
+  calculateDummyPoints,
   generateHCPChoices,
+  generateSupportPointChoices,
+  SUIT_SYMBOLS,
+  SUIT_NAMES,
+  SUIT_COLORS,
+  SUPPORT_POINT_MAX,
   type BridgeHand,
+  type Suit,
 } from "@/lib/bridge";
 import { nanoid } from "nanoid";
 import { saveSession, saveHandResult } from "@/lib/db";
@@ -33,19 +42,55 @@ interface Props {
   onQuit: () => void;
 }
 
+// Determine valuation mode from settings
+function getMode(settings: GameSettings): "hcp" | "support" {
+  return (settings.extra?.mode as "hcp" | "support") ?? "hcp";
+}
+
+// Compute correct answer based on mode
+function computeCorrectAnswer(
+  hand: BridgeHand,
+  mode: "hcp" | "support",
+  trumpSuit?: Suit
+): number {
+  if (mode === "support") {
+    return calculateDummyPoints(hand, trumpSuit);
+  }
+  return calculateHCP(hand);
+}
+
+// Generate choices based on mode
+function computeChoices(
+  correctAnswer: number,
+  mode: "hcp" | "support"
+): number[] {
+  if (mode === "support") {
+    return generateSupportPointChoices(correctAnswer);
+  }
+  return generateHCPChoices(correctAnswer);
+}
+
 export default function PointCountingPlay({
   settings,
   onComplete,
   onQuit,
 }: Props) {
+  const mode = getMode(settings);
   const sessionId = useRef(nanoid());
   const startTime = useRef(Date.now());
   const handStartTime = useRef(Date.now());
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Trump suit is only used in support mode
+  const initialTrump = mode === "support" ? generateRandomTrumpSuit() : null;
+  const [trumpSuit, setTrumpSuit] = useState<Suit | null>(initialTrump);
+
   const [hand, setHand] = useState<BridgeHand>(() => generateRandomHand());
-  const [correctAnswer, setCorrectAnswer] = useState(() => calculateHCP(hand));
+  const [correctAnswer, setCorrectAnswer] = useState(() =>
+    computeCorrectAnswer(hand, mode, initialTrump ?? undefined)
+  );
   const [choices, setChoices] = useState(() =>
-    generateHCPChoices(correctAnswer)
+    computeChoices(correctAnswer, mode)
   );
   const [userInput, setUserInput] = useState("");
   const [displayMode, setDisplayMode] = useState(settings.displayMode);
@@ -62,20 +107,28 @@ export default function PointCountingPlay({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isEasy = settings.difficulty === "easy";
+  const pointsLabel = mode === "support" ? "SP" : "HCP";
 
   const generateNewHand = useCallback(() => {
     const newHand = generateRandomHand();
-    const hcp = calculateHCP(newHand);
+    const newTrump = mode === "support" ? generateRandomTrumpSuit() : null;
+    const answer = computeCorrectAnswer(
+      newHand,
+      mode,
+      newTrump ?? undefined
+    );
+
     setHand(newHand);
-    setCorrectAnswer(hcp);
-    setChoices(generateHCPChoices(hcp));
+    setTrumpSuit(newTrump);
+    setCorrectAnswer(answer);
+    setChoices(computeChoices(answer, mode));
     setUserInput("");
     setFeedback(null);
     setSelectedIndex(0);
     handStartTime.current = Date.now();
     setTimerKey(k => k + 1);
     setIsTimerRunning(true);
-  }, []);
+  }, [mode]);
 
   const submitAnswer = useCallback(
     (answer: string) => {
@@ -155,7 +208,7 @@ export default function PointCountingPlay({
         finalResults.length;
       const accuracy = totalCorrect / finalResults.length;
 
-      const avgHCP =
+      const avgPoints =
         finalResults.reduce(
           (sum, r) => sum + parseInt(r.correctAnswer, 10),
           0
@@ -171,7 +224,7 @@ export default function PointCountingPlay({
         accuracy,
         totalTime,
         averageTime: avgTime,
-        extraData: { averageHCP: avgHCP },
+        extraData: { averageHCP: avgPoints },
       };
 
       saveSession({
@@ -186,7 +239,7 @@ export default function PointCountingPlay({
         totalTime,
         averageTime: avgTime,
         accuracy,
-        extraData: JSON.stringify({ averageHCP: avgHCP }),
+        extraData: JSON.stringify({ averageHCP: avgPoints }),
       });
 
       onComplete(gameResults);
@@ -308,9 +361,22 @@ export default function PointCountingPlay({
             <CardDisplay hand={hand} mode={displayMode} />
           </div>
 
+          {/* Trump suit indicator (support points mode only) */}
+          {mode === "support" && trumpSuit && (
+            <div className="text-center text-sm text-muted-foreground mb-4">
+              Trump:{" "}
+              <span style={{ color: SUIT_COLORS[trumpSuit] }}>
+                {SUIT_SYMBOLS[trumpSuit]}
+              </span>{" "}
+              {SUIT_NAMES[trumpSuit]}
+            </div>
+          )}
+
           {/* Question */}
           <p className="text-center text-sm text-muted-foreground mb-4 font-serif">
-            How many high card points?
+            {mode === "support"
+              ? "How many support points?"
+              : "How many high card points?"}
           </p>
 
           {/* Answer area */}
@@ -358,11 +424,15 @@ export default function PointCountingPlay({
                       ref={inputRef}
                       type="number"
                       min={0}
-                      max={37}
+                      max={mode === "support" ? SUPPORT_POINT_MAX : 37}
                       value={userInput}
                       onChange={e => setUserInput(e.target.value)}
-                      placeholder="HCP"
-                      aria-label="High card points"
+                      placeholder={pointsLabel}
+                      aria-label={
+                        mode === "support"
+                          ? "Support points"
+                          : "High card points"
+                      }
                       className="text-center font-mono text-lg h-12"
                     />
                     <Button
@@ -393,7 +463,7 @@ export default function PointCountingPlay({
                   {feedback.isCorrect ? (
                     <>
                       <Check className="w-4 h-4" />
-                      Correct! {feedback.correct} HCP
+                      Correct! {feedback.correct} {pointsLabel}
                     </>
                   ) : (
                     <>
@@ -401,7 +471,7 @@ export default function PointCountingPlay({
                       {feedback.user === "-1"
                         ? "Time's up!"
                         : `You said ${feedback.user}`}{" "}
-                      — correct answer: {feedback.correct} HCP
+                      — correct answer: {feedback.correct} {pointsLabel}
                     </>
                   )}
                 </div>

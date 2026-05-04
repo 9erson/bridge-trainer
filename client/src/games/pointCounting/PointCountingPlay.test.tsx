@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 // Read source file for static class analysis (matches History.test.tsx pattern)
 const source = readFileSync(
@@ -100,5 +100,140 @@ describe("PointCountingPlay — feedback badge theme tokens (#32)", () => {
     expect(source).toContain("bg-destructive/10");
     expect(source).toContain("text-destructive");
     expect(source).toContain("border-destructive/30");
+  });
+});
+
+// ============================================================
+// Support Points mode tests (#56)
+// ============================================================
+
+const supportHardSettings: GameSettings = {
+  gameId: "point-counting",
+  difficulty: "hard",
+  handCount: 5,
+  timerSeconds: null,
+  feedbackMode: "immediate",
+  displayMode: "text",
+  extra: { mode: "support" },
+};
+
+const supportEasySettings: GameSettings = {
+  gameId: "point-counting",
+  difficulty: "easy",
+  handCount: 5,
+  timerSeconds: null,
+  feedbackMode: "immediate",
+  displayMode: "text",
+  extra: { mode: "support" },
+};
+
+describe("PointCountingPlay — support points mode (#56)", () => {
+  it("displays 'support points' question text in support mode", async () => {
+    const { default: PointCountingPlay } = await import(
+      "@/games/pointCounting/PointCountingPlay"
+    );
+    render(
+      <PointCountingPlay
+        settings={supportHardSettings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    expect(screen.getByText(/support points/i)).toBeTruthy();
+    expect(screen.queryByText(/high card points/i)).toBeNull();
+  });
+
+  it("displays trump suit indicator in support mode", async () => {
+    const { default: PointCountingPlay } = await import(
+      "@/games/pointCounting/PointCountingPlay"
+    );
+    render(
+      <PointCountingPlay
+        settings={supportHardSettings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    expect(screen.getByText(/trump:/i)).toBeTruthy();
+  });
+
+  it("hard mode input has 'Support points' aria-label in support mode", async () => {
+    const { default: PointCountingPlay } = await import(
+      "@/games/pointCounting/PointCountingPlay"
+    );
+    render(
+      <PointCountingPlay
+        settings={supportHardSettings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    const input = document.querySelector<HTMLInputElement>(
+      'input[type="number"]'
+    );
+    expect(input).not.toBeNull();
+    expect(input!.getAttribute("aria-label")).toMatch(/support points/i);
+  });
+
+  it("hard mode input has SP placeholder in support mode", async () => {
+    const { default: PointCountingPlay } = await import(
+      "@/games/pointCounting/PointCountingPlay"
+    );
+    render(
+      <PointCountingPlay
+        settings={supportHardSettings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    const input = document.querySelector<HTMLInputElement>(
+      'input[type="number"]'
+    );
+    expect(input).not.toBeNull();
+    expect(input!.getAttribute("placeholder")).toBe("SP");
+  });
+
+  it("imports calculateDummyPoints and generateRandomTrumpSuit", () => {
+    // Verify the source file imports the needed functions
+    expect(source).toContain("calculateDummyPoints");
+    expect(source).toContain("generateRandomTrumpSuit");
+    expect(source).toContain("generateSupportPointChoices");
+  });
+});
+
+describe("PointCountingPlay — HCP mode unchanged (#56)", () => {
+  it("displays 'high card points' question text in HCP mode", async () => {
+    const { default: PointCountingPlay } = await import(
+      "@/games/pointCounting/PointCountingPlay"
+    );
+    render(
+      <PointCountingPlay
+        settings={hardModeSettings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    expect(screen.getByText(/high card points/i)).toBeTruthy();
+    expect(screen.queryByText(/support points/i)).toBeNull();
+  });
+
+  it("does not display trump suit indicator in HCP mode", async () => {
+    const { default: PointCountingPlay } = await import(
+      "@/games/pointCounting/PointCountingPlay"
+    );
+    render(
+      <PointCountingPlay
+        settings={hardModeSettings}
+        onComplete={() => {}}
+        onQuit={() => {}}
+      />
+    );
+
+    expect(screen.queryByText(/trump:/i)).toBeNull();
   });
 });

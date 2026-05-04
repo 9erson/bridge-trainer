@@ -175,6 +175,44 @@ export function getRankDisplay(rank: Rank): string {
   return rank === "T" ? "10" : rank;
 }
 
+// Maximum support (dummy) points for choice generation
+export const SUPPORT_POINT_MAX = 10;
+
+// Generate a random trump suit
+export function generateRandomTrumpSuit(): Suit {
+  return SUITS[Math.floor(Math.random() * SUITS.length)];
+}
+
+// Generate multiple choice options for support points (0–10 range)
+export function generateSupportPointChoices(
+  correctAnswer: number,
+  count: number = 5
+): number[] {
+  const choices = new Set<number>([correctAnswer]);
+  let attempts = 0;
+
+  while (choices.size < count && attempts < 100) {
+    const offset = Math.floor(Math.random() * 5) - 2; // -2 to +2
+    const candidate = Math.max(
+      0,
+      Math.min(SUPPORT_POINT_MAX, correctAnswer + offset)
+    );
+    if (candidate !== correctAnswer) {
+      choices.add(candidate);
+    }
+    attempts++;
+  }
+
+  // Fallback: fill remaining slots with sequential values
+  let fill = 0;
+  while (choices.size < count) {
+    if (!choices.has(fill)) choices.add(fill);
+    fill++;
+  }
+
+  return Array.from(choices).sort((a, b) => a - b);
+}
+
 // Generate multiple choice options for HCP
 export function generateHCPChoices(
   correctAnswer: number,
