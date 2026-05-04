@@ -62,9 +62,7 @@ describe("DisplayModeToggle", () => {
       expect(buttonsBefore.length).toBe(2);
 
       // Re-render with same props
-      rerender(
-        <DisplayModeToggle mode="text" onChange={stableOnChange} />
-      );
+      rerender(<DisplayModeToggle mode="text" onChange={stableOnChange} />);
 
       const buttonsAfter = container.querySelectorAll("button");
       expect(buttonsAfter.length).toBe(2);
@@ -85,9 +83,7 @@ describe("DisplayModeToggle", () => {
       const textButton = screen.getByRole("button", { name: /text/i });
       expect(textButton.className).toContain("h-11");
 
-      rerender(
-        <DisplayModeToggle mode="graphic" onChange={onChange} />
-      );
+      rerender(<DisplayModeToggle mode="graphic" onChange={onChange} />);
 
       // Cards button should now be active
       const cardsButton = screen.getByRole("button", { name: /cards/i });

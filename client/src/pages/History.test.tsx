@@ -226,13 +226,12 @@ describe("History — mobile responsive layout (#29)", () => {
     // The score and avg-time divs should not have unconditional shrink-0.
     // They should use md:shrink-0 so they can flex on mobile.
     // Match "shrink-0" that is NOT preceded by "md:" (i.e. unconditional)
-    const unconditionalShrink = sessionRowSection.match(
-      /(?<!md:)shrink-0/g
-    );
+    const unconditionalShrink = sessionRowSection.match(/(?<!md:)shrink-0/g);
     // Only the delete Button should have unconditional shrink-0 (it's always 44px)
     // Filter to only <div> elements with unconditional shrink-0
-    const divsWithUnconditionalShrink =
-      sessionRowSection.match(/<div[^>]*className="[^"]*(?<!md:)shrink-0[^"]*"/g);
+    const divsWithUnconditionalShrink = sessionRowSection.match(
+      /<div[^>]*className="[^"]*(?<!md:)shrink-0[^"]*"/g
+    );
     expect(
       divsWithUnconditionalShrink,
       "No <div> in SessionRow should have unconditional shrink-0"
@@ -281,9 +280,7 @@ describe("History — React.memo optimization (#18)", () => {
   });
 
   it("StatCard is wrapped in React.memo", () => {
-    expect(historySource).toMatch(
-      /const StatCard = memo\(function StatCard/
-    );
+    expect(historySource).toMatch(/const StatCard = memo\(function StatCard/);
   });
 
   it("SessionRow is wrapped in React.memo", () => {
