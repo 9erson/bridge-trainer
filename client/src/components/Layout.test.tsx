@@ -28,13 +28,16 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-// Simple wrapper providing wouter context
+// Simple wrapper providing wouter context + ThemeProvider
 import { Route, Switch } from "wouter";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 function TestWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <Switch>
-      <Route>{children}</Route>
-    </Switch>
+    <ThemeProvider defaultTheme="light" switchable>
+      <Switch>
+        <Route>{children}</Route>
+      </Switch>
+    </ThemeProvider>
   );
 }
 
@@ -110,9 +113,9 @@ describe("Layout", () => {
       </TestWrapper>
     );
 
-    // The mobile hamburger is the only <button> in the mobile header
+    // The mobile hamburger is identified by its aria-label (not ThemeToggle)
     const hamburger = document.querySelector<HTMLButtonElement>(
-      '[data-slot="button"]'
+      '[data-slot="button"][aria-label="Toggle sidebar"]'
     );
     expect(hamburger).not.toBeNull();
     expect(hamburger!.getAttribute("aria-label")).toBe("Toggle sidebar");
@@ -196,5 +199,31 @@ describe("Layout — layout thrashing fix (#17)", () => {
       layoutSource,
       "Layout mobile nav container should use display:grid for grid-template-rows animation"
     ).toMatch(/display:\s*["']?grid["']?/);
+  });
+});
+
+describe("Layout — dark mode toggle (#16)", () => {
+  it("imports and renders ThemeToggle in desktop sidebar", async () => {
+    const { default: Layout } = await import("@/components/Layout");
+    render(
+      <TestWrapper>
+        <Layout>Test content</Layout>
+      </TestWrapper>
+    );
+
+    // ThemeToggle renders buttons with aria-label "Switch to dark mode" (in light mode)
+    // It should appear in the desktop sidebar (aside) footer
+    const aside = document.querySelector("aside");
+    expect(aside).not.toBeNull();
+
+    // The toggle should be present somewhere in the layout
+    const toggleButtons = screen.getAllByLabelText("Switch to dark mode");
+    expect(toggleButtons.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("imports ThemeToggle module (source check)", () => {
+    expect(layoutSource, "Layout should import ThemeToggle").toContain(
+      "ThemeToggle"
+    );
   });
 });

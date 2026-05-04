@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { getAllGames } from "@/lib/gameRegistry";
 import { Spade, History, Menu, X, ChevronRight, BookOpen } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -83,22 +84,25 @@ export default function Layout({ children }: LayoutProps) {
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-sidebar-border">
+        <div className="p-4 border-t border-sidebar-border flex items-center justify-between">
           <p className="text-xs text-sidebar-foreground/50">
             v1.0 — Practice makes perfect
           </p>
+          <ThemeToggle />
         </div>
       </aside>
 
       {/* Mobile header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-sidebar text-sidebar-foreground border-b border-sidebar-border">
-        <div className="flex items-center justify-between px-4 h-12">
+        <div className="flex items-center gap-2 px-4 h-12">
           <Link href="/" className="flex items-center gap-2 no-underline">
             <Spade className="w-4 h-4 text-sidebar-primary" />
             <span className="font-bold text-sm text-sidebar-foreground">
               Bridge Trainer
             </span>
           </Link>
+          <div className="flex-1" />
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="sm"

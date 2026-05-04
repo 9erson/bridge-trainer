@@ -140,3 +140,17 @@ describe("App — lazy-loaded ConventionReference (#12)", () => {
     ).not.toMatch(/^import\s+ConventionReference\s+from/m);
   });
 });
+
+describe("App — dark mode toggle (#16)", () => {
+  const appSource = fs.readFileSync(
+    path.resolve(import.meta.dirname, "App.tsx"),
+    "utf-8"
+  );
+
+  it("ThemeProvider has switchable prop enabled", () => {
+    expect(
+      appSource,
+      "ThemeProvider should have switchable prop for dark mode toggle"
+    ).toMatch(/ThemeProvider[^>]*switchable/);
+  });
+});
